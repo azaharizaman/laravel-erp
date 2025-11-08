@@ -296,7 +296,7 @@ This implementation plan covers the integration of the `azaharizaman/laravel-ser
 
 - **DEP-001**: Laravel 12.x framework installed and configured
 - **DEP-002**: PHP 8.2+ for typed properties
-- **DEP-003**: azaharizaman/laravel-serial-numbering package (install via composer)
+- **DEP-003**: azaharizaman/laravel-serial-numbering package (install via composer require azaharizaman/laravel-serial-numbering:dev-main). **Note**: The 'dev-main' stability is intentionally specified for internal packages as per project coding guidelines which require 'dev' composer stability for all internal/organizational packages during active development. This ensures the latest features and fixes are available while the package ecosystem matures.
 - **DEP-004**: Tenant system must be implemented (PRD-01) for multi-tenant scoping
 - **DEP-005**: All domain models must exist before applying HasSerialNumbering trait
 - **DEP-006**: Database migrations for serial number columns on models must be created
