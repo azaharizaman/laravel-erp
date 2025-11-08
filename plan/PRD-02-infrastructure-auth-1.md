@@ -74,8 +74,9 @@ This implementation plan covers the complete authentication and authorization sy
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
 | TASK-001 | Modify existing users table migration to use UUID for id column | | |
-| TASK-002 | Add columns to users: tenant_id (FK), status (enum), email_verified_at, password, remember_token, mfa_enabled (boolean), mfa_secret (encrypted), last_login_at, failed_login_attempts (integer), locked_until (timestamp) | | |
-| TASK-003 | Add indexes: (tenant_id, email) unique, (tenant_id, status), email, last_login_at | | |
+| TASK-002 | Add columns to users: tenant_id (FK), status (enum), email_verified_at, password, remember_token, last_login_at | | |
+| TASK-003 | Add columns to users: mfa_enabled (boolean), mfa_secret (encrypted), failed_login_attempts (integer), locked_until (timestamp) | | |
+| TASK-004 | Add indexes: (tenant_id, email) unique, (tenant_id, status), email, last_login_at | | |
 | TASK-004 | Create UserStatus enum in app/Domains/Core/Enums/UserStatus.php with values: ACTIVE, INACTIVE, LOCKED, SUSPENDED | | |
 | TASK-005 | Update User model in app/Models/User.php to use UUID, HasApiTokens, HasRoles, BelongsToTenant, LogsActivity traits | | |
 | TASK-006 | Add fillable fields, hidden fields (password, mfa_secret), and casts to User model | | |
