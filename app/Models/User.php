@@ -6,10 +6,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domains\Core\Enums\UserStatus;
-use App\Domains\Core\Models\Tenant;
+use App\Domains\Core\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -19,7 +18,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, HasUuids, LogsActivity, Notifiable;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasUuids, LogsActivity, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -73,14 +72,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the tenant that owns the user.
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
-    /**
      * Check if the user is an administrator.
      */
     public function isAdmin(): bool
@@ -98,6 +89,8 @@ class User extends Authenticatable
 
     /**
      * Check if the user account is locked.
+     *
+     * Checks both permanent lock status and temporary lockout timestamp.
      */
     public function isLocked(): bool
     {
@@ -123,20 +116,25 @@ class User extends Authenticatable
 
     /**
      * Increment failed login attempts.
+     *
+     * Automatically locks the account for 30 minutes after 5 failed attempts.
      */
     public function incrementFailedLoginAttempts(): void
     {
-        $this->increment('failed_login_attempts');
+        $this->failed_login_attempts++;
 
         // Lock account after 5 failed attempts
         if ($this->failed_login_attempts >= 5) {
             $this->locked_until = now()->addMinutes(30);
-            $this->save();
         }
+
+        $this->save();
     }
 
     /**
      * Reset failed login attempts.
+     *
+     * Clears the failed login counter and removes any temporary lockout.
      */
     public function resetFailedLoginAttempts(): void
     {

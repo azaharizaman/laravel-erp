@@ -109,6 +109,8 @@ class UserFactory extends Factory
 
     /**
      * Indicate that the user has failed login attempts.
+     *
+     * @param  int  $attempts  Number of failed login attempts
      */
     public function withFailedAttempts(int $attempts = 3): static
     {
