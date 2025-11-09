@@ -161,13 +161,13 @@ class TenantControllerTest extends TestCase
         $response = $this->getJson('/api/v1/tenants?sort_by=name&sort_direction=asc');
 
         $response->assertOk();
-        
+
         // Get all tenant names and verify sorting
         $data = $response->json('data');
         $names = array_column($data, 'name');
         $sortedNames = $names;
         sort($sortedNames);
-        
+
         $this->assertEquals($sortedNames, $names, 'Tenants should be sorted by name in ascending order');
     }
 

@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Tenant extends Model
 {
-    use HasFactory, HasUuids, LogsActivity, SoftDeletes;
+    use HasFactory, HasUuids, LogsActivity, Searchable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -105,6 +106,32 @@ class Tenant extends Model
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /**
+     * Get the name of the index associated with the model.
+     */
+    public function searchableAs(): string
+    {
+        return 'tenants';
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'domain' => $this->domain,
+            'status' => $this->status,
+            'subscription_plan' => $this->subscription_plan,
+            'billing_email' => $this->billing_email,
+            'contact_name' => $this->contact_name,
+            'contact_email' => $this->contact_email,
+            'created_at' => $this->created_at?->timestamp,
+        ];
     }
 
     /**

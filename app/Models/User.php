@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use BelongsToTenant, HasApiTokens, HasFactory, HasUuids, LogsActivity, Notifiable;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasUuids, LogsActivity, Notifiable, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -169,5 +170,29 @@ class User extends Authenticatable
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
+    }
+
+    /**
+     * Get the name of the index associated with the model.
+     */
+    public function searchableAs(): string
+    {
+        return 'users';
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'status' => $this->status,
+            'tenant_id' => $this->tenant_id,
+            'is_admin' => $this->is_admin,
+            'created_at' => $this->created_at?->timestamp,
+        ];
     }
 }

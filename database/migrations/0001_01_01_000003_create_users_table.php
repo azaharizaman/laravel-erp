@@ -16,43 +16,43 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             // Primary key - UUID
             $table->uuid('id')->primary();
-            
+
             // Tenant relationship
             $table->uuid('tenant_id')->nullable();
-            
+
             // Basic user information
             $table->string('name');
             $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
-            
+
             // User status
             $table->string('status')->default('active');
-            
+
             // Authentication tracking
             $table->timestamp('last_login_at')->nullable();
-            
+
             // Multi-factor authentication
             $table->boolean('mfa_enabled')->default(false);
             $table->text('mfa_secret')->nullable();
-            
+
             // Account security
             $table->integer('failed_login_attempts')->default(0);
             $table->timestamp('locked_until')->nullable();
-            
+
             // Admin flag (from existing migration)
             $table->boolean('is_admin')->default(false);
-            
+
             // Timestamps
             $table->timestamps();
-            
+
             // Foreign keys
             $table->foreign('tenant_id')
                 ->references('id')
                 ->on('tenants')
                 ->onDelete('cascade');
-            
+
             // Indexes
             $table->unique(['tenant_id', 'email']);
             $table->index(['tenant_id', 'status']);

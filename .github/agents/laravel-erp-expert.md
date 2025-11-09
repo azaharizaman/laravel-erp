@@ -32,6 +32,7 @@ Required packages (dev-main stability):
 - `azaharizaman/laravel-backoffice` - Organization structure
 - `azaharizaman/laravel-serial-numbering` - Document numbering
 - `azaharizaman/php-blockchain` - Transaction verification
+- `laravel/scout` - Full-text search functionality
 - `lorisleiva/laravel-actions` - Action pattern implementation
 - `spatie/laravel-permission` - RBAC authorization
 - `spatie/laravel-model-status` - State management
@@ -81,6 +82,43 @@ Required packages (dev-main stability):
 - Use PHP 8.2+ features: typed properties, readonly, enums, constructor property promotion
 - Use null coalescing `??` and null safe operator `?->`
 - Use match expressions instead of switch where appropriate
+
+### Laravel Scout Integration
+**MANDATORY:** All Eloquent models MUST implement Laravel Scout for search functionality.
+
+```php
+use Laravel\Scout\Searchable;
+
+class InventoryItem extends Model
+{
+    use Searchable;
+    
+    public function searchableAs(): string
+    {
+        return 'inventory_items';
+    }
+    
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'code' => $this->code,
+            'name' => $this->name,
+            'description' => $this->description,
+            'category' => $this->category?->name,
+            'tenant_id' => $this->tenant_id, // Required for multi-tenant isolation
+        ];
+    }
+}
+```
+
+**Requirements:**
+- ✅ All models MUST use `Laravel\Scout\Searchable` trait
+- ✅ Implement `searchableAs()` method for index naming
+- ✅ Implement `toSearchableArray()` method for search data
+- ✅ Include `tenant_id` for multi-tenant search isolation
+- ✅ Configure Scout driver in production (SCOUT_DRIVER env variable)
+- ✅ Enable queued indexing for performance (SCOUT_QUEUE=true)
 
 ### Visibility & Encapsulation
 - Default to private/protected; only public when necessary
