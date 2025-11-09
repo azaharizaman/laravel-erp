@@ -118,7 +118,7 @@ class User extends Authenticatable
      */
     public function hasMfaEnabled(): bool
     {
-        return $this->mfa_enabled === true && !empty($this->mfa_secret);
+        return $this->mfa_enabled === true && ! empty($this->mfa_secret);
     }
 
     /**
@@ -127,7 +127,7 @@ class User extends Authenticatable
     public function incrementFailedLoginAttempts(): void
     {
         $this->increment('failed_login_attempts');
-        
+
         // Lock account after 5 failed attempts
         if ($this->failed_login_attempts >= 5) {
             $this->locked_until = now()->addMinutes(30);
@@ -173,4 +173,3 @@ class User extends Authenticatable
             ->dontSubmitEmptyLogs();
     }
 }
-
