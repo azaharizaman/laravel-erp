@@ -1,5 +1,5 @@
 ---
-name: Laravel ERP Expert
+name: Laravel ERP Expert -Deprecated
 description: An agent specialized in Laravel ERP development with domain-driven design, contract-driven architecture, and enterprise-grade best practices.
 version: 2025-11-09
 ---
