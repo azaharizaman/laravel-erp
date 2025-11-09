@@ -55,8 +55,8 @@ class ListTenantsCommand extends Command
         $this->newLine();
 
         try {
-            // Get all tenants
-            $query = \App\Domains\Core\Models\Tenant::query();
+            // Build tenant query via repository
+            $query = $this->tenantRepository->query();
 
             // Apply status filter if provided
             if ($this->option('status')) {
