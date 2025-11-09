@@ -19,15 +19,24 @@ class TenantControllerTest extends TestCase
 
     protected User $normalUser;
 
+    protected Tenant $sharedTenant;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create admin user
-        $this->adminUser = User::factory()->admin()->create();
+        // Create a shared tenant for test users
+        $this->sharedTenant = Tenant::factory()->create();
 
-        // Create normal user
-        $this->normalUser = User::factory()->create();
+        // Create admin user with the shared tenant
+        $this->adminUser = User::factory()->admin()->create([
+            'tenant_id' => $this->sharedTenant->id,
+        ]);
+
+        // Create normal user with the shared tenant
+        $this->normalUser = User::factory()->create([
+            'tenant_id' => $this->sharedTenant->id,
+        ]);
     }
 
     /**
@@ -81,7 +90,7 @@ class TenantControllerTest extends TestCase
                 'links',
                 'meta',
             ])
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(4, 'data'); // 3 created + 1 shared from setUp
     }
 
     /**
@@ -118,7 +127,7 @@ class TenantControllerTest extends TestCase
         $response = $this->getJson('/api/v1/tenants?status=active');
 
         $response->assertOk()
-            ->assertJsonCount(2, 'data');
+            ->assertJsonCount(3, 'data'); // 2 created + 1 shared from setUp (which is active)
     }
 
     /**
@@ -151,10 +160,15 @@ class TenantControllerTest extends TestCase
 
         $response = $this->getJson('/api/v1/tenants?sort_by=name&sort_direction=asc');
 
-        $response->assertOk()
-            ->assertJsonPath('data.0.name', 'Alpha Inc')
-            ->assertJsonPath('data.1.name', 'Beta LLC')
-            ->assertJsonPath('data.2.name', 'Zeta Corp');
+        $response->assertOk();
+        
+        // Get all tenant names and verify sorting
+        $data = $response->json('data');
+        $names = array_column($data, 'name');
+        $sortedNames = $names;
+        sort($sortedNames);
+        
+        $this->assertEquals($sortedNames, $names, 'Tenants should be sorted by name in ascending order');
     }
 
     /**
@@ -437,13 +451,13 @@ class TenantControllerTest extends TestCase
         $archivedTenant = Tenant::factory()->create(['status' => TenantStatus::ARCHIVED]);
         $archivedTenant->delete();
 
-        // Without archived
+        // Without archived - should include shared tenant and activeTenant
         $response = $this->getJson('/api/v1/tenants');
-        $response->assertOk()->assertJsonCount(1, 'data');
+        $response->assertOk()->assertJsonCount(2, 'data'); // shared + active
 
-        // With archived
+        // With archived - should include all three
         $response = $this->getJson('/api/v1/tenants?with_archived=1');
-        $response->assertOk()->assertJsonCount(2, 'data');
+        $response->assertOk()->assertJsonCount(3, 'data'); // shared + active + archived
     }
 
     /**

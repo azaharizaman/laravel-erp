@@ -39,15 +39,17 @@ class TenantScopeTest extends TestCase
         $model = new class extends Model
         {
             use BelongsToTenant;
+            use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
             protected $table = 'users';
 
-            protected $fillable = ['name', 'email', 'password', 'tenant_id'];
+            protected $fillable = ['name', 'email', 'password', 'tenant_id', 'status'];
         };
 
         $model->name = 'Auto Tenant User';
         $model->email = 'autouser@example.com';
         $model->password = bcrypt('password');
+        $model->status = 'active';
         // Note: We are NOT setting tenant_id explicitly
         $model->save();
 
@@ -74,15 +76,17 @@ class TenantScopeTest extends TestCase
         $model = new class extends Model
         {
             use BelongsToTenant;
+            use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
             protected $table = 'users';
 
-            protected $fillable = ['name', 'email', 'password', 'tenant_id'];
+            protected $fillable = ['name', 'email', 'password', 'tenant_id', 'status'];
         };
 
         $model->name = 'Explicit Tenant User';
         $model->email = 'explicit@example.com';
         $model->password = bcrypt('password');
+        $model->status = 'active';
         $model->tenant_id = $tenant2->id; // Explicitly set to different tenant
         $model->save();
 
@@ -326,16 +330,18 @@ class TenantScopeTest extends TestCase
         $model = new class extends Model
         {
             use BelongsToTenant;
+            use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
             protected $table = 'users';
 
-            protected $fillable = ['name', 'email', 'password', 'tenant_id'];
+            protected $fillable = ['name', 'email', 'password', 'tenant_id', 'status'];
         };
 
         $model->tenant_id = $tenant->id;
         $model->name = 'Test User';
         $model->email = 'test@example.com';
         $model->password = bcrypt('password');
+        $model->status = 'active';
         $model->save();
 
         $relationship = $model->tenant();

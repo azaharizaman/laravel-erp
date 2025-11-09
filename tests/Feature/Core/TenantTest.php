@@ -28,15 +28,24 @@ class TenantTest extends TestCase
 
     protected User $normalUser;
 
+    protected Tenant $sharedTenant;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create admin user for privileged operations
-        $this->adminUser = User::factory()->admin()->create();
+        // Create a shared tenant for test users
+        $this->sharedTenant = Tenant::factory()->create();
 
-        // Create normal user for permission testing
-        $this->normalUser = User::factory()->create();
+        // Create admin user for privileged operations with shared tenant
+        $this->adminUser = User::factory()->admin()->create([
+            'tenant_id' => $this->sharedTenant->id,
+        ]);
+
+        // Create normal user for permission testing with shared tenant
+        $this->normalUser = User::factory()->create([
+            'tenant_id' => $this->sharedTenant->id,
+        ]);
     }
 
     /**

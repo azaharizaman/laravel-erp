@@ -46,16 +46,18 @@ class BelongsToTenantTest extends TestCase
         $model = new class extends Model
         {
             use BelongsToTenant;
+            use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
             protected $table = 'users';
 
-            protected $fillable = ['name', 'email', 'password', 'tenant_id'];
+            protected $fillable = ['name', 'email', 'password', 'tenant_id', 'status'];
         };
 
         $model->tenant_id = $tenant->id;
         $model->name = 'Test User';
         $model->email = 'test@example.com';
         $model->password = bcrypt('password');
+        $model->status = 'active';
         $model->save();
 
         $relationship = $model->tenant();
@@ -78,15 +80,17 @@ class BelongsToTenantTest extends TestCase
         $model = new class extends Model
         {
             use BelongsToTenant;
+            use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
             protected $table = 'users';
 
-            protected $fillable = ['name', 'email', 'password', 'tenant_id'];
+            protected $fillable = ['name', 'email', 'password', 'tenant_id', 'status'];
         };
 
         $model->name = 'New User';
         $model->email = 'newuser@example.com';
         $model->password = bcrypt('password');
+        $model->status = 'active';
         $model->save();
 
         $this->assertEquals($tenant->id, $model->tenant_id);
@@ -107,15 +111,17 @@ class BelongsToTenantTest extends TestCase
         $model = new class extends Model
         {
             use BelongsToTenant;
+            use \Illuminate\Database\Eloquent\Concerns\HasUuids;
 
             protected $table = 'users';
 
-            protected $fillable = ['name', 'email', 'password', 'tenant_id'];
+            protected $fillable = ['name', 'email', 'password', 'tenant_id', 'status'];
         };
 
         $model->name = 'New User';
         $model->email = 'newuser@example.com';
         $model->password = bcrypt('password');
+        $model->status = 'active';
         $model->tenant_id = $tenant2->id; // Explicitly set to different tenant
         $model->save();
 
