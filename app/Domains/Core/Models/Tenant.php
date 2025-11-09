@@ -81,11 +81,8 @@ class Tenant extends Model
 
     /**
      * Scope a query to only include active tenants.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeActive($query)
+    public function scopeActive(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('status', TenantStatus::ACTIVE);
     }
