@@ -28,15 +28,24 @@ class TenantTest extends TestCase
 
     protected User $normalUser;
 
+    protected Tenant $sharedTenant;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Create admin user for privileged operations
-        $this->adminUser = User::factory()->admin()->create();
+        // Create a shared tenant for test users
+        $this->sharedTenant = Tenant::factory()->create();
 
-        // Create normal user for permission testing
-        $this->normalUser = User::factory()->create();
+        // Create admin user for privileged operations with shared tenant
+        $this->adminUser = User::factory()->admin()->create([
+            'tenant_id' => $this->sharedTenant->id,
+        ]);
+
+        // Create normal user for permission testing with shared tenant
+        $this->normalUser = User::factory()->create([
+            'tenant_id' => $this->sharedTenant->id,
+        ]);
     }
 
     /**
@@ -123,10 +132,10 @@ class TenantTest extends TestCase
         Tenant::factory()->count(2)->create(['status' => TenantStatus::SUSPENDED]);
         Tenant::factory()->create(['status' => TenantStatus::ARCHIVED]);
 
-        // Test listing all tenants
+        // Test listing all tenants (6 created + 1 shared)
         $response = $this->getJson('/api/v1/tenants');
         $response->assertOk()
-            ->assertJsonCount(6, 'data');
+            ->assertJsonCount(7, 'data');
 
         // Test pagination
         $response = $this->getJson('/api/v1/tenants?per_page=3');
@@ -138,10 +147,10 @@ class TenantTest extends TestCase
                 'meta' => ['current_page', 'last_page', 'per_page', 'total'],
             ]);
 
-        // Test filtering by status
+        // Test filtering by status (3 created + 1 shared which is active)
         $response = $this->getJson('/api/v1/tenants?status=active');
         $response->assertOk()
-            ->assertJsonCount(3, 'data');
+            ->assertJsonCount(4, 'data');
 
         $response = $this->getJson('/api/v1/tenants?status=suspended');
         $response->assertOk()

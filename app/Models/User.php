@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Domains\Core\Models\Tenant;
+use App\Domains\Core\Enums\UserStatus;
+use App\Domains\Core\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasUuids, LogsActivity, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +30,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'status',
+        'email_verified_at',
+        'last_login_at',
+        'mfa_enabled',
+        'mfa_secret',
+        'failed_login_attempts',
+        'locked_until',
         'is_admin',
     ];
 
@@ -38,6 +48,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'mfa_secret',
     ];
 
     /**
@@ -49,17 +60,15 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'locked_until' => 'datetime',
             'password' => 'hashed',
+            'status' => UserStatus::class,
+            'mfa_enabled' => 'boolean',
+            'mfa_secret' => 'encrypted',
+            'failed_login_attempts' => 'integer',
             'is_admin' => 'boolean',
         ];
-    }
-
-    /**
-     * Get the tenant that owns the user.
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /**
@@ -68,5 +77,97 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->is_admin === true;
+    }
+
+    /**
+     * Check if the user account is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::ACTIVE;
+    }
+
+    /**
+     * Check if the user account is locked.
+     *
+     * Checks both permanent lock status and temporary lockout timestamp.
+     */
+    public function isLocked(): bool
+    {
+        if ($this->status === UserStatus::LOCKED) {
+            return true;
+        }
+
+        // Check temporary lockout
+        if ($this->locked_until && $this->locked_until->isFuture()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if MFA is enabled for the user.
+     */
+    public function hasMfaEnabled(): bool
+    {
+        return $this->mfa_enabled === true && ! empty($this->mfa_secret);
+    }
+
+    /**
+     * Increment failed login attempts.
+     *
+     * Automatically locks the account for 30 minutes after 5 failed attempts.
+     */
+    public function incrementFailedLoginAttempts(): void
+    {
+        $this->failed_login_attempts++;
+
+        // Lock account after 5 failed attempts
+        if ($this->failed_login_attempts >= 5) {
+            $this->locked_until = now()->addMinutes(30);
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Reset failed login attempts.
+     *
+     * Clears the failed login counter and removes any temporary lockout.
+     */
+    public function resetFailedLoginAttempts(): void
+    {
+        $this->failed_login_attempts = 0;
+        $this->locked_until = null;
+        $this->save();
+    }
+
+    /**
+     * Update last login timestamp.
+     */
+    public function updateLastLogin(): void
+    {
+        $this->last_login_at = now();
+        $this->save();
+    }
+
+    /**
+     * Get the activity log options for the model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+                'email',
+                'status',
+                'tenant_id',
+                'is_admin',
+                'mfa_enabled',
+                'last_login_at',
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }

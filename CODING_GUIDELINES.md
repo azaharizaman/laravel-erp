@@ -458,20 +458,295 @@ class CreateUsersTable extends Migration { }
 return new class extends Migration { };
 ```
 
+### Mistake 7: Migration Ordering Issues with Foreign Keys
+
+**Problem:** Creating a table with foreign key constraints before the referenced table exists causes migration failures.
+
+**❌ Incorrect Order:**
+```php
+// File: 0001_01_01_000000_create_users_table.php
+Schema::create('users', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->uuid('tenant_id')->nullable();
+    
+    // ❌ This will fail because 'tenants' table doesn't exist yet
+    $table->foreign('tenant_id')
+        ->references('id')
+        ->on('tenants')
+        ->onDelete('cascade');
+});
+
+// File: 2025_11_09_023509_create_tenants_table.php (runs AFTER users)
+Schema::create('tenants', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    // ...
+});
+```
+
+**✅ Correct Order:**
+
+Parent tables must be created before child tables that reference them.
+
+**Option 1: Rename migrations to control order**
+```php
+// File: 0001_01_01_000000_create_tenants_table.php (runs FIRST)
+Schema::create('tenants', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    // ...
+});
+
+// File: 0001_01_01_000003_create_users_table.php (runs AFTER tenants)
+Schema::create('users', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->uuid('tenant_id')->nullable();
+    
+    // ✅ Now 'tenants' table exists
+    $table->foreign('tenant_id')
+        ->references('id')
+        ->on('tenants')
+        ->onDelete('cascade');
+});
+```
+
+**Option 2: Separate foreign key into its own migration**
+```php
+// File: 0001_01_01_000000_create_users_table.php
+Schema::create('users', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    $table->uuid('tenant_id')->nullable(); // Column only, no FK yet
+    // ...
+});
+
+// File: 0001_01_01_000001_create_tenants_table.php
+Schema::create('tenants', function (Blueprint $table) {
+    $table->uuid('id')->primary();
+    // ...
+});
+
+// File: 0001_01_01_000002_add_tenant_foreign_key_to_users.php
+Schema::table('users', function (Blueprint $table) {
+    // ✅ Add FK after both tables exist
+    $table->foreign('tenant_id')
+        ->references('id')
+        ->on('tenants')
+        ->onDelete('cascade');
+});
+```
+
+**Why:** Migration files run in alphanumeric order. Foreign key constraints require the referenced table to exist first, otherwise the migration will fail with a constraint error.
+
+**Best Practice:** 
+- Create parent/reference tables (tenants, roles, etc.) before child tables (users, posts, etc.)
+- Use timestamp prefixes like `0001_01_01_000000` for base tables
+- Number dependent tables sequentially: `000001`, `000002`, `000003`
+- Test migrations on a fresh database: `php artisan migrate:fresh`
+
+### Mistake 8: Race Conditions in Increment Operations
+
+**Problem:** Using `$model->increment()` followed by checking `$model->attribute` uses stale data, causing logic errors.
+
+**❌ Incorrect:**
+```php
+public function incrementFailedLoginAttempts(): void
+{
+    $this->increment('failed_login_attempts');
+    
+    // ❌ $this->failed_login_attempts still has OLD value from before increment
+    if ($this->failed_login_attempts >= 5) {
+        $this->locked_until = now()->addMinutes(30);
+        $this->save();
+    }
+}
+```
+
+**Why it's wrong:**
+1. `increment()` updates the database directly via SQL: `UPDATE users SET failed_login_attempts = failed_login_attempts + 1`
+2. The model's in-memory attribute is NOT automatically updated
+3. Checking `$this->failed_login_attempts` uses the OLD value
+4. Account lockout won't trigger until the 6th attempt instead of 5th
+
+**✅ Correct Option 1: Increment in-memory then save**
+```php
+public function incrementFailedLoginAttempts(): void
+{
+    $this->failed_login_attempts++;
+    
+    // Lock account after 5 failed attempts
+    if ($this->failed_login_attempts >= 5) {
+        $this->locked_until = now()->addMinutes(30);
+    }
+    
+    $this->save(); // Single save with all changes
+}
+```
+
+**✅ Correct Option 2: Refresh after increment**
+```php
+public function incrementFailedLoginAttempts(): void
+{
+    $this->increment('failed_login_attempts');
+    $this->refresh(); // ✅ Reload from database to get updated value
+    
+    // Now $this->failed_login_attempts has the correct value
+    if ($this->failed_login_attempts >= 5) {
+        $this->locked_until = now()->addMinutes(30);
+        $this->save();
+    }
+}
+```
+
+**When to use each approach:**
+- **Option 1 (in-memory)**: Best for most cases - cleaner, single DB query
+- **Option 2 (refresh)**: Use when other processes might modify the record concurrently
+
+**Similar issues to avoid:**
+- Using `decrement()` then checking the value
+- Using `update()` then accessing updated attributes
+- Any direct SQL modification followed by attribute access
+
+### Mistake 9: Not Using Traits for Shared Functionality
+
+**Problem:** Manually implementing functionality that already exists in a trait causes code duplication and missing features.
+
+**❌ Incorrect:**
+```php
+use App\Domains\Core\Models\Tenant;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class User extends Authenticatable
+{
+    // Manually defining tenant relationship
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+    
+    // Missing:
+    // - Automatic tenant_id setting on creation
+    // - Global scope for tenant filtering
+    // - withoutTenantScope() helper
+    // - withAllTenants() helper
+}
+```
+
+**✅ Correct:**
+```php
+use App\Domains\Core\Traits\BelongsToTenant;
+
+class User extends Authenticatable
+{
+    use BelongsToTenant; // ✅ Gets all tenant functionality automatically
+    
+    // The trait provides:
+    // - tenant() relationship
+    // - Automatic tenant_id on creation
+    // - Global scope for filtering
+    // - withoutTenantScope() method
+    // - withAllTenants() method
+    // - getCurrentTenantIdForModel() helper
+}
+```
+
+**Benefits of using traits:**
+- **DRY Principle**: Don't repeat yourself - write once, use everywhere
+- **Consistency**: Same behavior across all models
+- **Maintainability**: Fix bugs in one place
+- **Features**: Get helper methods and automatic behaviors
+- **Testing**: Trait tested once, confidence in all models
+
+**Common Laravel traits to use:**
+- `BelongsToTenant` - Multi-tenancy functionality (project-specific)
+- `SoftDeletes` - Soft delete functionality
+- `HasFactory` - Factory support for testing
+- `HasUuids` - UUID primary keys
+- `LogsActivity` - Audit logging (Spatie package)
+- `HasRoles` - Role-based permissions (Spatie package)
+
+**Before implementing manually, check if:**
+1. A trait exists in the project (`app/Domains/Core/Traits/`)
+2. A Laravel built-in trait exists (`Illuminate\Database\Eloquent\`)
+3. A package trait exists (Spatie, etc.)
+
+### Mistake 10: Incomplete PHPDoc for Factory State Methods
+
+**Problem:** Factory state methods lack parameter and return type documentation, making them harder to use and understand.
+
+**❌ Incorrect:**
+```php
+/**
+ * Indicate that the user has failed login attempts.
+ */
+public function withFailedAttempts(int $attempts = 3): static
+{
+    return $this->state(fn (array $attributes) => [
+        'failed_login_attempts' => $attempts,
+    ]);
+}
+```
+
+**✅ Correct:**
+```php
+/**
+ * Indicate that the user has failed login attempts.
+ *
+ * @param int $attempts Number of failed login attempts
+ * @return static
+ */
+public function withFailedAttempts(int $attempts = 3): static
+{
+    return $this->state(fn (array $attributes) => [
+        'failed_login_attempts' => $attempts,
+    ]);
+}
+```
+
+**Why:**
+- IDEs show parameter descriptions in autocomplete
+- Documentation generators create better API docs
+- Other developers understand parameters without reading code
+- Follows Laravel and PHPStan standards
+
+**Factory state method documentation template:**
+```php
+/**
+ * Brief description of what state this creates
+ *
+ * @param Type $param Description of parameter (if any)
+ * @return static
+ */
+public function stateName($param = default): static
+```
+
 ---
 
 ## Code Review Checklist
 
 Before submitting code for review, ensure:
 
+### Type Safety & Documentation
 - [ ] All PHP files have `declare(strict_types=1);`
 - [ ] All method parameters have type hints
 - [ ] All methods declare return types
 - [ ] All public/protected methods have PHPDoc blocks with `@return` tags
+- [ ] Factory state methods have `@param` and `@return` documentation
+- [ ] PHPDoc uses imported class names, not FQCNs
+
+### Architecture & Design
+- [ ] Using traits instead of manual implementation (e.g., `BelongsToTenant`)
+- [ ] No race conditions in increment/decrement operations
+- [ ] Models use appropriate traits: `HasUuids`, `SoftDeletes`, `LogsActivity`, etc.
+
+### Database & Migrations
 - [ ] All migrations use anonymous class format
+- [ ] Migration order is correct (parent tables before child tables with FKs)
+- [ ] Foreign key constraints reference existing tables
+- [ ] Tested with `php artisan migrate:fresh` on clean database
+
+### Code Quality
 - [ ] Code passes Laravel Pint formatting (`./vendor/bin/pint`)
 - [ ] All tests pass (`php artisan test`)
 - [ ] No untyped variables or parameters remain
+- [ ] No code duplication - using traits where applicable
 
 ---
 
