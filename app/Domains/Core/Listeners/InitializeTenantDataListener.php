@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\Core\Listeners;
 
 use App\Domains\Core\Events\TenantCreatedEvent;
+use App\Domains\Core\Models\Tenant;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
@@ -47,7 +48,7 @@ class InitializeTenantDataListener implements ShouldQueue
      *
      * @param  Tenant  $tenant  The tenant to initialize roles for
      */
-    protected function createDefaultRoles(\App\Domains\Core\Models\Tenant $tenant): void
+    protected function createDefaultRoles(Tenant $tenant): void
     {
         // TODO: Implement role creation when spatie/laravel-permission is integrated
         // Example implementation:
@@ -73,9 +74,9 @@ class InitializeTenantDataListener implements ShouldQueue
      * Creates foundational permissions that are common across all tenants
      * in the ERP system (e.g., view-dashboard, manage-users, etc.).
      *
-     * @param  \App\Domains\Core\Models\Tenant  $tenant  The tenant to initialize permissions for
+     * @param  Tenant  $tenant  The tenant to initialize permissions for
      */
-    protected function createDefaultPermissions(\App\Domains\Core\Models\Tenant $tenant): void
+    protected function createDefaultPermissions(Tenant $tenant): void
     {
         // TODO: Implement permission creation when spatie/laravel-permission is integrated
         // Example implementation:
@@ -107,9 +108,9 @@ class InitializeTenantDataListener implements ShouldQueue
      * Initializes default configuration and settings that each tenant needs
      * to operate (e.g., timezone, currency, fiscal year settings, etc.).
      *
-     * @param  \App\Domains\Core\Models\Tenant  $tenant  The tenant to initialize settings for
+     * @param  Tenant  $tenant  The tenant to initialize settings for
      */
-    protected function createDefaultSettings(\App\Domains\Core\Models\Tenant $tenant): void
+    protected function createDefaultSettings(Tenant $tenant): void
     {
         // TODO: Implement default settings creation
         // Example implementation:
