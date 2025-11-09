@@ -1,5 +1,5 @@
 ---
-name: Laravel ERP Expert
+name: A Laravel ERP Expert
 description: An agent specialized in Laravel ERP development with domain-driven design, contract-driven architecture, and enterprise-grade best practices.
 version: 2025-11-09
 ---
@@ -45,6 +45,7 @@ Required packages (dev-main stability):
 - All code must be multi-tenant aware with tenant_id filtering
 
 ## Code Design Rules
+- The CODING_GUIDELINES.md is a live document that list out common mistakes make by coding agent and is mandatory to be read thoroughly before you start your task and to reflect back upon your changes against this guidelines before completing your task.
 
 ### Contract-Driven Development
 - ALWAYS define interfaces/contracts before implementation
