@@ -1,59 +1,429 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel ERP System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Status: In Development](https://img.shields.io/badge/status-In%20Development-yellow)
+![PHP](https://img.shields.io/badge/PHP-8.2+-blue)
+![Laravel](https://img.shields.io/badge/Laravel-12+-red)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-## About Laravel
+**Enterprise-grade, headless ERP backend system** built with Laravel 12+ and PHP 8.2+. Designed to rival SAP, Odoo, and Microsoft Dynamics while maintaining superior modularity, extensibility, and agentic capabilities.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🎯 Overview
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+This is a **headless, API-first ERP system** providing comprehensive business management capabilities through RESTful APIs and CLI commands. No UI components, no views, no frontend assets - just a robust, scalable backend ready to integrate with any frontend or automated system.
 
-## Learning Laravel
+### Key Characteristics
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- 🏗️ **Architecture:** Headless backend-only system (API + CLI)
+- 🔌 **Integration:** RESTful APIs (`/api/v1/`) and Artisan commands (`erp:`)
+- 🎨 **Design:** Contract-driven, Domain-driven, Event-driven
+- 🤖 **Target Users:** AI agents, custom frontends, automated systems
+- 🧩 **Modularity:** Enable/disable modules without system-wide impact
+- 🔒 **Security:** Zero-trust model for critical operations
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 📋 Table of Contents
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- [Features](#-features)
+- [Technology Stack](#-technology-stack)
+- [Architecture](#-architecture)
+- [Getting Started](#-getting-started)
+- [Development](#-development)
+- [Documentation](#-documentation)
+- [Testing](#-testing)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ✨ Features
 
-## Contributing
+### Core Infrastructure
+- ✅ **Multi-Tenancy System** - Complete tenant isolation with automatic scoping
+- ✅ **Authentication & Authorization** - Sanctum API tokens + Spatie Permission
+- ✅ **Audit Logging** - Complete activity tracking with Spatie Activitylog
+- ✅ **Serial Numbering** - Configurable document numbering system
+- ✅ **Settings Management** - Tenant-scoped configuration system
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Backoffice Management
+- ✅ **Company Management** - Multi-company support with laravel-backoffice package
+- ✅ **Office Management** - Office hierarchy with location tracking
+- ✅ **Department Management** - Department structure with cost centers
+- ✅ **Staff Management** - Employee records with organizational hierarchy
 
-## Code of Conduct
+### Inventory Management
+- 🚧 **Item Master** - Product/material master data (Planned)
+- 🚧 **Warehouse Management** - Multi-warehouse support (Planned)
+- 🚧 **Stock Management** - Real-time inventory tracking (Planned)
+- 🚧 **UOM Management** - Unit of measure conversions (Planned)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Sales Management
+- 🚧 **Customer Management** - Customer master data (Planned)
+- 🚧 **Sales Quotation** - Quote generation and tracking (Planned)
+- 🚧 **Sales Order** - Order processing (Planned)
+- 🚧 **Pricing Management** - Dynamic pricing rules (Planned)
 
-## Security Vulnerabilities
+### Purchasing Management
+- 🚧 **Vendor Management** - Supplier master data (Planned)
+- 🚧 **Purchase Requisition** - Internal purchase requests (Planned)
+- 🚧 **Purchase Order** - PO creation and tracking (Planned)
+- 🚧 **Goods Receipt** - Receiving and QC (Planned)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Accounting (Future)
+- 📅 General Ledger
+- 📅 Accounts Payable/Receivable
+- 📅 Financial Reporting
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🛠️ Technology Stack
+
+### Core Framework
+- **PHP:** ≥ 8.2 (Using latest features: readonly, enums, union types)
+- **Laravel:** ≥ 12.x (Streamlined directory structure)
+- **Database:** Agnostic (MySQL, PostgreSQL, SQLite, SQL Server)
+
+### Key Packages
+
+#### Business Packages (Internal)
+```json
+{
+  "azaharizaman/laravel-uom-management": "dev-main",
+  "azaharizaman/laravel-inventory-management": "dev-main",
+  "azaharizaman/laravel-backoffice": "dev-main",
+  "azaharizaman/laravel-serial-numbering": "dev-main"
+}
+```
+
+#### Development Tools (Mandatory)
+```json
+{
+  "laravel/scout": "^10.0",          // MANDATORY: Search on all models
+  "laravel/pulse": "^1.0",           // Performance monitoring
+  "pestphp/pest": "^4.0",            // MANDATORY: Testing framework
+  "laravel/pint": "^1.0"             // MANDATORY: Code style
+}
+```
+
+#### Architecture Support
+```json
+{
+  "lorisleiva/laravel-actions": "^2.0",     // Action pattern
+  "spatie/laravel-permission": "^6.0",      // Authorization
+  "spatie/laravel-model-status": "^2.0",    // Status management
+  "spatie/laravel-activitylog": "^4.0",     // Audit logging
+  "brick/math": "^0.12"                      // Decimal precision
+}
+```
+
+---
+
+## 🏛️ Architecture
+
+### Design Patterns
+
+1. **Contract-Driven Development** - All dependencies abstracted behind interfaces
+2. **Domain-Driven Design** - Strict domain boundaries with clear responsibilities
+3. **Event-Driven Architecture** - Cross-domain communication via events
+4. **Repository Pattern** - Data access abstraction layer
+5. **Action Pattern** - Business operations using Laravel Actions
+6. **Package Decoupling** - External packages wrapped behind contracts
+
+### Directory Structure
+
+```
+app/
+├── Console/             # CLI Commands
+├── Domains/             # Domain-Driven Design structure
+│   ├── Core/            # Multi-tenancy, auth, settings
+│   ├── Backoffice/      # Organization structure
+│   ├── Inventory/       # Stock management
+│   ├── Sales/           # Customer orders
+│   ├── Purchasing/      # Vendor orders
+│   └── Accounting/      # Financial management
+├── Http/                # API Controllers, Requests, Resources
+├── Models/              # Global models (User)
+├── Providers/           # Service providers
+└── Support/             # Helper utilities & contracts
+    ├── Contracts/       # Interface definitions
+    ├── Services/        # Package adapters
+    └── Traits/          # Reusable model traits
+```
+
+### Domain Structure
+
+Each domain follows this structure:
+```
+{DomainName}/
+├── Actions/          # Business operations
+├── Contracts/        # Interfaces
+├── Events/           # Domain events
+├── Listeners/        # Event handlers
+├── Models/           # Eloquent models
+├── Observers/        # Model observers
+├── Policies/         # Authorization
+├── Repositories/     # Data access
+└── Services/         # Business logic
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- PHP ≥ 8.2
+- Composer
+- Database (MySQL 8.0+ / PostgreSQL 13+ / SQLite 3.35+)
+- Node.js & NPM (for asset compilation if needed)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/azaharizaman/laravel-erp.git
+   cd laravel-erp
+   ```
+
+2. **Install dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configure database**
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=laravel_erp
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+5. **Run migrations**
+   ```bash
+   php artisan migrate
+   ```
+
+6. **Seed initial data (optional)**
+   ```bash
+   php artisan db:seed
+   ```
+
+7. **Start development server**
+   ```bash
+   php artisan serve
+   ```
+
+The API will be available at `http://localhost:8000/api/v1/`
+
+---
+
+## 💻 Development
+
+### Coding Standards
+
+**🚨 CRITICAL:** Before writing any code, read:
+- [CODING_GUIDELINES.md](CODING_GUIDELINES.md) - Mandatory coding standards
+- [.github/copilot-instructions.md](.github/copilot-instructions.md) - Development patterns
+
+### Key Development Rules
+
+1. **Type Safety:** All files MUST have `declare(strict_types=1);`
+2. **Type Hints:** All methods MUST declare parameter types and return types
+3. **PHPDoc:** All public/protected methods MUST have complete PHPDoc blocks
+4. **Contracts First:** Define interfaces before implementation
+5. **Repository Pattern:** NO direct Model access in services
+6. **Package Decoupling:** Use contracts, not direct package dependencies
+7. **Testing:** Use Pest v4+ syntax (NO PHPUnit classes)
+8. **Multi-Tenancy:** Use `BelongsToTenant` trait on all tenant models
+9. **Search:** Use `IsSearchable` trait on all models (Laravel Scout)
+10. **Audit Logging:** Use `HasActivityLogging` trait for important models
+
+### Code Quality Tools
+
+```bash
+# Format code (MANDATORY before commit)
+./vendor/bin/pint
+
+# Run tests
+./vendor/bin/pest
+
+# Run with coverage
+./vendor/bin/pest --coverage
+
+# Parallel test execution
+./vendor/bin/pest --parallel
+```
+
+### Creating New Features
+
+1. **Define Contract** in `app/Domains/{Domain}/Contracts/`
+2. **Create Repository** implementing contract
+3. **Create Action** for business logic
+4. **Create Controller** for API endpoints
+5. **Add Tests** using Pest
+6. **Run Pint** to format code
+
+Example:
+```bash
+# Create new domain action
+php artisan make:action Inventory/CreateItemAction
+
+# Create feature test
+php artisan make:test Inventory/CreateItemTest --pest
+
+# Format and test
+./vendor/bin/pint
+./vendor/bin/pest
+```
+
+---
+
+## 📚 Documentation
+
+### Core Documentation
+- **[CODING_GUIDELINES.md](CODING_GUIDELINES.md)** - Comprehensive coding standards
+- **[GitHub Copilot Instructions](.github/copilot-instructions.md)** - AI-assisted development guide
+- **[Package Decoupling Strategy](docs/architecture/PACKAGE-DECOUPLING-STRATEGY.md)** - Architecture patterns
+
+### Feature Documentation
+- **[Multi-Tenancy System](docs/middleware-tenant-resolution.md)** - Tenant isolation guide
+- **[Sanctum Authentication](docs/SANCTUM_AUTHENTICATION.md)** - API authentication
+
+### Implementation Plans
+All PRDs are located in `plan/` directory:
+- `PRD-01` through `PRD-05`: Infrastructure (Multi-tenancy, Auth, Audit, Serial, Settings)
+- `PRD-06` through `PRD-09`: Backoffice (Company, Office, Department, Staff)
+- `PRD-10` through `PRD-13`: Inventory (Items, Warehouse, Stock, UOM)
+- `PRD-14` through `PRD-17`: Sales (Customers, Quotation, Orders, Pricing)
+- `PRD-18` through `PRD-21`: Purchasing (Vendors, Requisition, PO, Receipt)
+
+---
+
+## 🧪 Testing
+
+### Test Structure
+```
+tests/
+├── Unit/           # Unit tests (isolated, no database)
+├── Feature/        # Feature tests (with database)
+└── Pest.php        # Pest configuration
+```
+
+### Running Tests
+
+```bash
+# All tests
+./vendor/bin/pest
+
+# Specific test file
+./vendor/bin/pest tests/Feature/Auth/LoginTest.php
+
+# Specific test
+./vendor/bin/pest --filter="can create tenant"
+
+# With coverage
+./vendor/bin/pest --coverage --min=80
+
+# Parallel execution
+./vendor/bin/pest --parallel
+```
+
+### Test Requirements
+
+- ✅ ALL tests MUST use Pest v4+ syntax (NO PHPUnit classes)
+- ✅ Feature tests MUST use `RefreshDatabase` trait
+- ✅ Unit tests MUST NOT touch the database
+- ✅ Use factories for test data creation
+- ✅ Test API endpoints for authentication and authorization
+- ✅ Test cross-tenant access prevention
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these guidelines:
+
+1. **Read Documentation First**
+   - [CODING_GUIDELINES.md](CODING_GUIDELINES.md)
+   - [.github/copilot-instructions.md](.github/copilot-instructions.md)
+
+2. **Create Feature Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Follow Coding Standards**
+   - Use `declare(strict_types=1);`
+   - Add type hints to all methods
+   - Write complete PHPDoc blocks
+   - Use repository pattern
+   - Write Pest tests
+
+4. **Run Quality Checks**
+   ```bash
+   ./vendor/bin/pint
+   ./vendor/bin/pest
+   ```
+
+5. **Commit with Conventional Commits**
+   ```bash
+   git commit -m "feat: add customer management API"
+   git commit -m "fix: resolve tenant isolation bug"
+   git commit -m "docs: update README with new features"
+   ```
+
+6. **Create Pull Request**
+   - Provide clear description
+   - Reference related issues
+   - Ensure all tests pass
+   - Request review from maintainers
+
+### Commit Message Format
+
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation changes
+- `refactor:` - Code refactoring
+- `test:` - Test additions or changes
+- `chore:` - Maintenance tasks
+
+---
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+Built with:
+- [Laravel](https://laravel.com) - PHP Framework
+- [Spatie Packages](https://spatie.be/open-source) - Laravel ecosystem tools
+- [Laravel Actions](https://laravelactions.com) - Action pattern implementation
+- [Pest PHP](https://pestphp.com) - Testing framework
+
+---
+
+## 📞 Support
+
+- **Documentation:** Check `docs/` directory and PRD files in `plan/`
+- **Issues:** [GitHub Issues](https://github.com/azaharizaman/laravel-erp/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/azaharizaman/laravel-erp/discussions)
+
+---
+
+**Version:** 1.0.0-dev  
+**Last Updated:** November 10, 2025  
+**Status:** Active Development
