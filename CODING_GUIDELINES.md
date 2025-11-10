@@ -1088,6 +1088,281 @@ class LoggingServiceProvider extends ServiceProvider
 
 **See:** [docs/architecture/PACKAGE-DECOUPLING-STRATEGY.md](docs/architecture/PACKAGE-DECOUPLING-STRATEGY.md) for comprehensive decoupling guide.
 
+**Pattern:**
+1. Create contract in `app/Support/Contracts/`
+2. Create adapter in `app/Support/Services/{Category}/`
+3. Bind in service provider
+4. Inject contract in business code
+5. Never import package classes in domain code
+
+### 9a. Using Wrapper Traits in Models
+
+**✅ REQUIRED:** Models MUST use our wrapper traits instead of direct package traits to maintain decoupling.
+
+#### Available Wrapper Traits
+
+**1. HasActivityLogging** - Activity logging with Spatie Activitylog
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domains\YourDomain\Models;
+
+use App\Support\Traits\HasActivityLogging;
+use Illuminate\Database\Eloquent\Model;
+
+class YourModel extends Model
+{
+    use HasActivityLogging;
+    
+    /**
+     * Configure activity logging for this model
+     *
+     * @return array<string, mixed>
+     */
+    protected function configureActivityLogging(): array
+    {
+        return [
+            'log_name' => 'your_model',  // Custom log name
+            'log_attributes' => [          // Specific attributes to log
+                'name',
+                'status',
+                'important_field',
+            ],
+            'log_only_dirty' => true,      // Only log changed attributes
+            'dont_submit_empty_logs' => true, // Skip empty logs
+        ];
+    }
+}
+```
+
+**Configuration Options:**
+- `log_name`: Custom log name (default: table name)
+- `log_attributes`: Array of attributes to log
+- `log_all`: Log all attributes (default: false)
+- `log_only_dirty`: Only log changed attributes (default: false)
+- `dont_submit_empty_logs`: Skip empty logs (default: false)
+
+**Helper Methods:**
+- `getActivityLogs()`: Get all activities for this model
+- `getLatestActivity()`: Get the most recent activity
+
+**2. IsSearchable** - Search functionality with Laravel Scout
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domains\YourDomain\Models;
+
+use App\Support\Traits\IsSearchable;
+use Illuminate\Database\Eloquent\Model;
+
+class YourModel extends Model
+{
+    use IsSearchable;
+    
+    /**
+     * Configure search behavior for this model
+     *
+     * @return array<string, mixed>
+     */
+    protected function configureSearchable(): array
+    {
+        return [
+            'index_name' => 'custom_index',  // Custom search index name
+            'searchable_fields' => [          // Fields to include in search
+                'id',
+                'name',
+                'description',
+                'status',
+                'tenant_id',  // Always include for multi-tenancy
+            ],
+        ];
+    }
+}
+```
+
+**Configuration Options:**
+- `index_name`: Custom search index name (default: table name)
+- `searchable_fields`: Array of fields to include in search index (default: all fields)
+
+**Automatic Features:**
+- Tenant isolation: `tenant_id` is automatically included if present
+- The trait overrides `toSearchableArray()` and `searchableAs()` methods
+
+**3. HasTokens** - API token management with Laravel Sanctum
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use App\Support\Traits\HasTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable
+{
+    use HasTokens;
+    
+    /**
+     * Configure token behavior for this model
+     *
+     * @return array<string, mixed>
+     */
+    protected function configureTokens(): array
+    {
+        return [
+            'default_abilities' => ['read', 'write'],  // Default token abilities
+            'token_prefix' => 'api',                    // Token name prefix
+        ];
+    }
+}
+```
+
+**Configuration Options:**
+- `default_abilities`: Array of default abilities for new tokens (default: ['*'])
+- `token_prefix`: String prefix for token names (default: none)
+
+**Helper Methods:**
+- `createApiToken($name, $abilities = ['*'])`: Create a new token
+- `revokeApiToken($tokenId)`: Revoke a specific token
+- `revokeAllApiTokens()`: Revoke all user tokens
+- `getActiveTokens()`: Get all active tokens
+- `currentTokenHasAbility($ability)`: Check current token ability
+
+#### Complete Model Example
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Domains\Core\Models;
+
+use App\Domains\Core\Enums\TenantStatus;
+use App\Domains\Core\Traits\BelongsToTenant;
+use App\Support\Traits\HasActivityLogging;
+use App\Support\Traits\IsSearchable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Tenant extends Model
+{
+    use BelongsToTenant, HasActivityLogging, IsSearchable, SoftDeletes;
+    
+    protected $fillable = [
+        'name',
+        'domain',
+        'status',
+        'configuration',
+    ];
+    
+    protected $casts = [
+        'status' => TenantStatus::class,
+        'configuration' => 'encrypted:array',
+    ];
+    
+    /**
+     * Configure activity logging
+     */
+    protected function configureActivityLogging(): array
+    {
+        return [
+            'log_name' => 'tenants',
+            'log_attributes' => ['name', 'domain', 'status'],
+            'log_only_dirty' => true,
+            'dont_submit_empty_logs' => true,
+        ];
+    }
+    
+    /**
+     * Configure search behavior
+     */
+    protected function configureSearchable(): array
+    {
+        return [
+            'index_name' => 'tenants',
+            'searchable_fields' => ['id', 'name', 'domain', 'status'],
+        ];
+    }
+}
+```
+
+#### Using Contracts in Services
+
+**❌ Incorrect - Direct package usage:**
+
+```php
+class YourService
+{
+    public function doSomething(Model $model): void
+    {
+        // Direct Scout usage
+        $model->searchable();
+        
+        // Direct Spatie usage
+        activity()->log('Something happened');
+    }
+}
+```
+
+**✅ Correct - Use contracts:**
+
+```php
+class YourService
+{
+    public function __construct(
+        private readonly ActivityLoggerContract $activityLogger,
+        private readonly SearchServiceContract $searchService,
+    ) {}
+    
+    public function doSomething(Model $model): void
+    {
+        // Use search service contract
+        $this->searchService->index($model);
+        
+        // Use activity logger contract
+        $this->activityLogger->log('Something happened', $model);
+    }
+}
+```
+
+**Testing with Mocked Contracts:**
+
+```php
+use App\Support\Contracts\ActivityLoggerContract;
+use App\Support\Contracts\SearchServiceContract;
+
+test('service performs actions correctly', function () {
+    // Mock the contracts
+    $mockLogger = Mockery::mock(ActivityLoggerContract::class);
+    $mockSearch = Mockery::mock(SearchServiceContract::class);
+    
+    $mockLogger->shouldReceive('log')->once();
+    $mockSearch->shouldReceive('index')->once();
+    
+    // Bind mocks
+    $this->app->instance(ActivityLoggerContract::class, $mockLogger);
+    $this->app->instance(SearchServiceContract::class, $mockSearch);
+    
+    // Test your service
+    $service = app(YourService::class);
+    $service->doSomething($model);
+});
+```
+
+**Benefits of This Approach:**
+1. **Easy Testing**: Mock contracts without package-specific knowledge
+2. **Swappable**: Replace Scout with Meilisearch without changing business code
+3. **Maintainable**: Package upgrades isolated to adapters
+4. **Consistent**: Same interface across different implementations
+
 ---
 
 ## Security Best Practices
