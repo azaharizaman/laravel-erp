@@ -179,7 +179,7 @@ return [
     'cache' => [
 
         /*
-         * By default all permissions are cached for 24 hours to speed up performance.
+         * By default all permissions are cached for 1 hour to speed up performance.
          * When permissions or roles are updated the cache is flushed automatically.
          */
 
