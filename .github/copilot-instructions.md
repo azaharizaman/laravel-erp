@@ -1,6 +1,6 @@
 # Laravel ERP System - GitHub Copilot Instructions
 
-**Version:** 2.0.0  
+**Version:** 3.0.0  
 **Last Updated:** November 10, 2025  
 **Project:** Laravel Headless ERP Backend System
 
@@ -11,12 +11,13 @@
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2. [Technology Stack](#technology-stack)
-3. [Core Architecture Patterns](#core-architecture-patterns)
-4. [Mandatory Tool Integration](#mandatory-tool-integration)
-5. [Development Standards](#development-standards)
-6. [Domain Organization](#domain-organization)
-7. [Quick Reference](#quick-reference)
+2. [Documentation Structure](#documentation-structure)
+3. [Technology Stack](#technology-stack)
+4. [Core Architecture Patterns](#core-architecture-patterns)
+5. [Mandatory Tool Integration](#mandatory-tool-integration)
+6. [Development Standards](#development-standards)
+7. [Domain Organization](#domain-organization)
+8. [Quick Reference](#quick-reference)
 
 ---
 
@@ -49,6 +50,121 @@ This is an **enterprise-grade, headless ERP backend system** built with Laravel 
 - HTML/CSS assets
 - Server-side rendering
 - Traditional web forms
+
+---
+
+## Documentation Structure
+
+**CRITICAL:** Understand the distinction between PRDs and PLANs before creating any documentation.
+
+### Directory Organization
+
+```
+/docs/
+  ├── prd/                          # Product Requirements Documents
+  │   ├── PRD01-MVP.md              # Master PRD: WHAT to build
+  │   ├── PRD01-SUB01-*.md          # Sub-PRDs: Module requirements
+  │   └── README.md                 # PRD directory index
+  │
+  ├── plan/                         # Implementation Plans
+  │   ├── PLAN01-implement-*.md     # HOW to build (implementation steps)
+  │   ├── ROADMAP.md                # 8-milestone roadmap
+  │   └── README.md                 # Plan directory index
+  │
+  ├── architecture/                 # Architecture Decisions
+  │   ├── PACKAGE-DECOUPLING-STRATEGY.md
+  │   └── *.md
+  │
+  ├── SANCTUM_AUTHENTICATION.md     # Technical Guides
+  └── middleware-tenant-resolution.md
+```
+
+### PRDs (Product Requirements Documents)
+
+**Location:** `/docs/prd/`
+
+**Purpose:** Define **WHAT** needs to be built (requirements, business logic, acceptance criteria)
+
+**Naming Convention:**
+- **Master PRD:** `PRD{number}-{product-name}.md`
+  - Example: `PRD01-MVP.md`, `PRD02-HEALTHCARE-INDUSTRY-MODULES.md`
+- **Sub-PRD:** `PRD{number}-SUB{number}-{module-name}.md`
+  - Example: `PRD01-SUB01-multitenancy.md`, `PRD02-SUB01-patient-management.md`
+
+**When to Create:**
+- ✅ New product or major feature set requirements
+- ✅ Breaking down master PRD into module-specific requirements
+- ✅ Industry-specific module requirements (healthcare, manufacturing, etc.)
+
+**What to Include:**
+- User stories and personas
+- Functional requirements (FR-*)
+- Non-functional requirements (PR-*, SR-*, SCR-*)
+- Business rules (BR-*)
+- Acceptance criteria
+- Success metrics
+
+### PLANs (Implementation Plans)
+
+**Location:** `/docs/plan/`
+
+**Purpose:** Define **HOW** to build (implementation steps, file structure, testing)
+
+**Naming Convention:** `PLAN{number}-{action}-{component}.md`
+
+**Action Verbs:**
+- `implement` - Build new functionality from scratch
+- `enhance` - Add features to existing functionality
+- `modify` - Change existing functionality
+- `remove` - Remove/deprecate functionality
+- `refactor` - Restructure without changing behavior
+- `optimize` - Improve performance
+- `migrate` - Data or code migration
+
+**Examples:**
+- `PLAN01-implement-multitenancy.md`
+- `PLAN15-enhance-user-permissions.md`
+- `PLAN23-refactor-repository-pattern.md`
+
+**When to Create:**
+- ✅ After sub-PRD is created
+- ✅ For each module that needs implementation
+- ✅ When modifying/enhancing existing modules
+
+**What to Include:**
+- Implementation phases (PHASE-*)
+- Tasks (TASK-*) with completion tracking
+- File structure and code organization
+- Testing specifications (TEST-*)
+- Dependencies and prerequisites
+- Risk mitigation strategies
+
+### Document Flow
+
+```
+PRD01-MVP.md (Master PRD)
+  │
+  ├─> PRD01-SUB01-multitenancy.md (Sub-PRD)
+  │   └─> PLAN01-implement-multitenancy.md (Implementation)
+  │
+  ├─> PRD01-SUB02-authentication.md (Sub-PRD)
+  │   └─> PLAN02-implement-authentication.md (Implementation)
+  │
+  └─> ... (more modules)
+```
+
+### Creating Sub-PRDs from Master PRDs
+
+Use the conversion prompt: `.github/prompts/convert-prd-to-subprd.md`
+
+**Process:**
+1. Identify module scope from master PRD
+2. Extract all relevant requirements
+3. Create sub-PRD file with proper naming
+4. Link back to master PRD
+5. Create corresponding implementation plan (PLAN file)
+
+**See:** [/docs/prd/README.md](../docs/prd/README.md) for complete guide
 
 ---
 

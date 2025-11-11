@@ -41,43 +41,98 @@ The Laravel ERP System is an **enterprise-grade, headless ERP backend** designed
 - **Modularity:** Enable/disable modules without system-wide impact
 - **Delivery Model:** Milestone-based with explicit issue dependencies
 
-### MVP Scope (6 PRDs)
+### MVP Scope (6 Core Modules)
+
+The MVP is defined by 6 core modules, each with its own Sub-PRD (What to build) and Implementation Plan (How to build it).
 
 ```mermaid
-graph LR
-    subgraph "MVP Delivery - Jan 1, 2026"
-        M1[Milestone 1<br/>Infrastructure<br/>Nov 10-30] --> M2[Milestone 2<br/>Auth & Audit<br/>Dec 1-15]
-        M2 --> M3[Milestone 3<br/>Business<br/>Dec 16-25]
-        M3 --> M4[Milestone 4<br/>UOM & Final<br/>Dec 26 - Jan 1]
-    end
-    
-    PRD01[PRD-01<br/>Multi-tenancy<br/>✅ Complete] --> M1
-    PRD02A[PRD-02A<br/>Core Auth] --> M1
-    PRD02B[PRD-02B<br/>User Mgmt] --> M2
-    PRD02C[PRD-02C<br/>Security] --> M2
-    PRD03[PRD-03<br/>Audit] --> M2
-    PRD04[PRD-04<br/>Serial Numbers] --> M3
-    PRD05[PRD-05<br/>Settings] --> M3
-    PRD13[PRD-13<br/>UOM] --> M4
-    PRD00A[PRD-00A<br/>GraphQL] --> M4
-    PRD00B[PRD-00B<br/>AI Hooks] --> M4
-    
-    style PRD01 fill:#90EE90
-    style M1 fill:#FFE4B5
-    style M2 fill:#FFE4B5
-    style M3 fill:#FFE4B5
-    style M4 fill:#FFE4B5
-```
+graph TD
+    subgraph "Laravel ERP Documentation Structure"
+        direction LR
 
-**Total:** 9 sub-PRDs, 47 issues, 421 tasks
+        subgraph "Level 1: Requirements (WHAT)"
+            PRD01_MVP("
+                **PRD01-MVP.md**
+                *Master Requirements*
+                (Defines WHAT to build)
+            ")
+        end
+
+        subgraph "Level 2: Module Breakdown (Sub-PRDs)"
+            PRD01_SUB01("**PRD01-SUB01**<br/>Multi-Tenancy")
+            PRD01_SUB02("**PRD01-SUB02**<br/>Authentication")
+            PRD01_SUB03("**PRD01-SUB03**<br/>Audit Logging")
+            PRD01_SUB04("**PRD01-SUB04**<br/>Serial Numbering")
+            PRD01_SUB05("**PRD01-SUB05**<br/>Settings Mgmt")
+            PRD01_SUB06("**PRD01-SUB06**<br/>UOM")
+        end
+
+        subgraph "Level 3: Implementation (HOW)"
+            PLAN01("**PLAN01**<br/>Implement Multi-Tenancy<br/>(Defines HOW to build it)")
+            PLAN02("**PLAN02**<br/>Implement Authentication")
+            PLAN03("**PLAN03**<br/>Implement Audit Logging")
+            PLAN04("**PLAN04**<br/>Implement Serial Numbering")
+            PLAN05("**PLAN05**<br/>Implement Settings Mgmt")
+            PLAN06("**PLAN06**<br/>Implement UOM")
+        end
+
+        PRD01_MVP --> |"is broken down into"| PRD01_SUB01
+        PRD01_MVP --> |"is broken down into"| PRD01_SUB02
+        PRD01_MVP --> |"is broken down into"| PRD01_SUB03
+        PRD01_MVP --> |"is broken down into"| PRD01_SUB04
+        PRD01_MVP --> |"is broken down into"| PRD01_SUB05
+        PRD01_MVP --> |"is broken down into"| PRD01_SUB06
+
+        PRD01_SUB01 --> |"is implemented by"| PLAN01
+        PRD01_SUB02 --> |"is implemented by"| PLAN02
+        PRD01_SUB03 --> |"is implemented by"| PLAN03
+        PRD01_SUB04 --> |"is implemented by"| PLAN04
+        PRD01_SUB05 --> |"is implemented by"| PLAN05
+        PRD01_SUB06 --> |"is implemented by"| PLAN06
+    end
+
+    style PRD01_MVP fill:#fff,stroke:#333,stroke-width:2px,color:#000
+    style PRD01_SUB01 fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,color:#000
+    style PRD01_SUB02 fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,color:#000
+    style PRD01_SUB03 fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,color:#000
+    style PRD01_SUB04 fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,color:#000
+    style PRD01_SUB05 fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,color:#000
+    style PRD01_SUB06 fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px,color:#000
+    style PLAN01 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000
+    style PLAN02 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000
+    style PLAN03 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000
+    style PLAN04 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000
+    style PLAN05 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000
+    style PLAN06 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px,color:#000
+```
 
 ---
 
-## 1. System Architecture & Classification
+## 1. Introduction
+
+The Laravel ERP System is an **enterprise-grade, headless ERP backend** designed to rival SAP, Odoo, and Microsoft Dynamics while maintaining superior modularity, extensibility, and AI-powered automation capabilities.
+
+**MVP Delivery Target:** January 1, 2026 (8 weeks from kickoff)
+
+### 1.1 Goals
+
+- Develop a modular ERP backend system using Laravel 12+ and PHP 8.2+.
+- Implement core ERP functionalities: Multi-tenancy, Authentication, Audit Logging, Serial Numbering, Settings Management, and Unit of Measure.
+- Ensure system is headless, providing RESTful and GraphQL APIs for frontend consumption.
+- Integrate AI capabilities for automation using `azaharizaman/huggingface-php`.
+- Follow strict domain-driven design, contract-driven development, and event-driven architecture.
+
+### 1.2 Non-Goals
+
+- Development of frontend applications or themes.
+- Migration of existing ERP systems or data.
+- Implementation of industry-specific features outside the defined MVP scope.
+
+### 1.3 System Overview
 
 The system is organized into four hierarchical layers, each serving distinct purposes:
 
-### 1.1 Core Architecture (Layer 0)
+#### 1.3.1 Core Architecture (Layer 0)
 
 **Purpose:** Architectural and technical requirements of the system foundation.
 
@@ -124,7 +179,7 @@ graph TB
 
 **Components:**
 
-#### 1.1.1 Multi-Tenancy Infrastructure
+#### 1.3.1.1 Multi-Tenancy Infrastructure
 - **PRD Reference:** PRD-01 (Fully Implemented)
 - **Status:** ✅ Complete
 - **Scope:** Single-instance multi-organization support
@@ -142,7 +197,7 @@ graph TB
   - Audit logging for impersonation
   - Encrypted tenant configuration
 
-#### 1.1.2 Database Design
+#### 1.3.1.2 Database Design
 - **Status:** ✅ Complete
 - **Primary Keys:** UUID across all tables
 - **Soft Deletes:** Enabled on all domain models
@@ -155,7 +210,7 @@ graph TB
   - Unique constraints scoped to tenant
   - Check constraints for enum validation
 
-#### 1.1.3 API Design
+#### 1.3.1.3 API Design
 - **Status:** 🚧 In Progress (RESTful ✅, GraphQL 📋)
 - **RESTful API:** `/api/v1/` namespace
 - **GraphQL API:** Schema-first design (PRD-00A, Milestone 4)
@@ -166,7 +221,7 @@ graph TB
 - **Pagination:** Cursor-based and offset-based
 - **Rate Limiting:** Per user, per tenant, per endpoint
 
-#### 1.1.4 GraphQL API Foundation (NEW)
+#### 1.3.1.4 GraphQL API Foundation (NEW)
 - **PRD Reference:** PRD-00A (Milestone 4)
 - **Status:** 📋 Planned
 - **Purpose:** Flexible, client-driven data querying
@@ -187,7 +242,7 @@ graph TB
   - Third-party API consumers
   - AI agent data queries
 
-#### 1.1.5 AI Automation Foundation (NEW)
+#### 1.3.1.5 AI Automation Foundation (NEW)
 - **PRD Reference:** PRD-00B (Milestone 4)
 - **Status:** 📋 Planned
 - **Purpose:** AI-powered automation and intelligence
@@ -210,7 +265,7 @@ graph TB
   - Queue-based async processing
   - Result storage and versioning
 
-#### 1.1.6 Package Decoupling Strategy
+#### 1.3.1.6 Package Decoupling Strategy
 - **Status:** ✅ High Priority Packages Decoupled
 - **Decoupled Packages:**
   - `spatie/laravel-activitylog` → ActivityLoggerContract ✅
@@ -230,13 +285,13 @@ graph TB
 
 ---
 
-### 1.2 Core Foundations (Layer 1)
+### 1.3.2 Core Foundations (Layer 1)
 
 **Purpose:** Hybrid technical and user requirements not specific to business use cases.
 
 **Status:** 🚧 Partially Implemented
 
-#### 1.2.1 Authentication & Authorization (🚧 In Progress)
+#### 1.3.2.1 Authentication & Authorization (🚧 In Progress)
 - **PRD Reference:** PRD-02 (Implemented up to Spatie Permission with tenant-scoped RBAC)
 - **Scope:** Secure API token-based auth with RBAC
 - **Implemented:**
@@ -278,7 +333,7 @@ graph TB
 - Backoffice: `backoffice.*`, `companies.*`, `offices.*`, `departments.*`, `staff.*`
 - Accounting: `accounting.*`, `gl.*`, `ap.*`, `ar.*`
 
-#### 1.2.2 Audit Logging & Activity Tracking
+#### 1.3.2.2 Audit Logging & Activity Tracking
 - **PRD Reference:** PRD-03
 - **Status:** 📋 Planned
 - **Scope:** Comprehensive activity logging with blockchain verification (optional)
@@ -293,7 +348,7 @@ graph TB
   - Permission change logging
   - Tenant isolation for logs
 
-#### 1.2.3 Serial Numbering System
+#### 1.3.2.3 Serial Numbering System
 - **PRD Reference:** PRD-04
 - **Status:** 📋 Planned
 - **Scope:** Configurable auto-incrementing serial numbers for documents
@@ -306,7 +361,7 @@ graph TB
 - **Multi-tenant:** Separate numbering per tenant
 - **Manual Override:** Allow manual number input with validation
 
-#### 1.2.4 Settings Management
+#### 1.3.2.4 Settings Management
 - **PRD Reference:** PRD-05
 - **Status:** 📋 Planned
 - **Scope:** Hierarchical configuration system
@@ -324,7 +379,7 @@ graph TB
   - CLI commands for bulk operations
   - Event-driven setting changes
 
-#### 1.2.5 Unit of Measure (UOM)
+#### 1.3.2.5 Unit of Measure (UOM)
 - **PRD Reference:** PRD-13
 - **Status:** 📋 Planned
 - **Scope:** Comprehensive UOM management with conversions
@@ -337,7 +392,7 @@ graph TB
   - Automatic conversion in transactions
   - Tenant-specific custom UOMs
 
-#### 1.2.6 Model Status Management
+#### 1.3.2.6 Model Status Management
 - **Scope:** State machine for domain models
 - **Package:** `spatie/laravel-model-status` (to be decoupled)
 - **Status Flows:**
@@ -353,15 +408,15 @@ graph TB
 
 ---
 
-### 1.3 Core Modules (Layer 2)
+### 1.4 Core Modules (Layer 2)
 
 **Purpose:** Essential business features for general industry use cases. Can be toggled but not completely disabled.
 
 **Status:** 📋 Planned (Target: MVP)
 
-#### 1.3.1 Financial Management
+#### 1.4.1 Financial Management
 
-##### 1.3.1.1 General Ledger (GL)
+##### 1.4.1.1 General Ledger (GL)
 - **Scope:** Double-entry accounting system
 - **Features:**
   - Chart of accounts (COA) with hierarchical structure
@@ -373,7 +428,7 @@ graph TB
   - Budget vs actual tracking
   - Automated GL posting from transactions
 
-##### 1.3.1.2 Accounts Payable (AP)
+##### 1.4.1.2 Accounts Payable (AP)
 - **Scope:** Vendor invoice and payment management
 - **Features:**
   - Vendor bill management
@@ -385,7 +440,7 @@ graph TB
   - Payment approval workflow
   - Automated GL posting
 
-##### 1.3.1.3 Accounts Receivable (AR)
+##### 1.4.1.3 Accounts Receivable (AR)
 - **Scope:** Customer invoice and collection management
 - **Features:**
   - Customer invoice generation
@@ -397,7 +452,7 @@ graph TB
   - Collection workflow
   - Automated GL posting
 
-##### 1.3.1.4 Cost Accounting
+##### 1.4.1.4 Cost Accounting
 - **Scope:** Product costing and profitability analysis
 - **Features:**
   - Standard costing vs actual costing
@@ -408,9 +463,9 @@ graph TB
   - Variance analysis
   - Profitability by product/customer/project
 
-#### 1.3.2 Human Capital Management (HCM)
+#### 1.4.2 Human Capital Management (HCM)
 
-##### 1.3.2.1 Staffing Management
+##### 1.4.2.1 Staffing Management
 - **PRD Reference:** PRD-09 (Staff Management)
 - **Scope:** Employee master data and lifecycle
 - **Features:**
@@ -422,7 +477,7 @@ graph TB
   - Document management (contracts, certifications)
   - Onboarding and offboarding workflows
 
-##### 1.3.2.2 Payroll (Future)
+##### 1.4.2.2 Payroll (Future)
 - **Scope:** Salary calculation and disbursement
 - **Features:**
   - Salary structure definition
@@ -433,7 +488,7 @@ graph TB
   - Statutory compliance
   - Bank file generation
 
-##### 1.3.2.3 Talent Management (Future)
+##### 1.4.2.3 Talent Management (Future)
 - **Scope:** Performance and development
 - **Features:**
   - Performance reviews
@@ -442,7 +497,7 @@ graph TB
   - Training management
   - Succession planning
 
-##### 1.3.2.4 Workforce Management (Future)
+##### 1.4.2.4 Workforce Management (Future)
 - **Scope:** Time and attendance
 - **Features:**
   - Time tracking
@@ -450,9 +505,9 @@ graph TB
   - Shift scheduling
   - Attendance reports
 
-#### 1.3.3 Supply Chain Management
+#### 1.4.3 Supply Chain Management
 
-##### 1.3.3.1 Inventory Management
+##### 1.4.3.1 Inventory Management
 - **PRD Reference:** PRD-10 (Item Master), PRD-12 (Stock Management)
 - **Package:** `azaharizaman/laravel-inventory-management`
 - **Scope:** Item master data and stock control
@@ -468,7 +523,7 @@ graph TB
   - ABC analysis
   - Stock aging reports
 
-##### 1.3.3.2 Warehouse Management
+##### 1.4.3.2 Warehouse Management
 - **PRD Reference:** PRD-11
 - **Scope:** Multi-warehouse and location management
 - **Features:**
@@ -480,7 +535,7 @@ graph TB
   - Putaway and picking strategies
   - Warehouse capacity management
 
-##### 1.3.3.3 Procurement
+##### 1.4.3.3 Procurement
 - **PRD Reference:** PRD-19 (Purchase Requisition), PRD-20 (Purchase Order), PRD-21 (Goods Receipt)
 - **Scope:** Purchase to pay process
 - **Features:**
@@ -493,7 +548,7 @@ graph TB
   - Purchase returns
   - Purchase analytics and spend analysis
 
-##### 1.3.3.4 Order Management
+##### 1.4.3.4 Order Management
 - **PRD Reference:** PRD-15 (Sales Quotation), PRD-16 (Sales Order)
 - **Scope:** Order to cash process
 - **Features:**
@@ -506,9 +561,9 @@ graph TB
   - Sales returns
   - Order analytics
 
-#### 1.3.4 Client Relationship Management (CRM)
+#### 1.4.4 Client Relationship Management (CRM)
 
-##### 1.3.4.1 Customer Management
+##### 1.4.4.1 Customer Management
 - **PRD Reference:** PRD-14
 - **Scope:** Customer master data and segmentation
 - **Features:**
@@ -521,7 +576,7 @@ graph TB
   - Document repository
   - Customer portal access (future)
 
-##### 1.3.4.2 Vendor Management
+##### 1.4.4.2 Vendor Management
 - **PRD Reference:** PRD-18
 - **Scope:** Vendor master data and evaluation
 - **Features:**
@@ -533,7 +588,7 @@ graph TB
   - Vendor evaluation and rating
   - Document repository
 
-##### 1.3.4.3 Pricing Management
+##### 1.4.4.3 Pricing Management
 - **PRD Reference:** PRD-17
 - **Scope:** Dynamic pricing and discounts
 - **Features:**
@@ -546,7 +601,7 @@ graph TB
   - Price approval workflow
   - Competitor price tracking
 
-##### 1.3.4.4 Sales Force Management (Future)
+##### 1.4.4.4 Sales Force Management (Future)
 - **Scope:** Sales team and pipeline management
 - **Features:**
   - Sales territory management
@@ -555,7 +610,7 @@ graph TB
   - Sales forecasting
   - Commission calculation
 
-##### 1.3.4.5 Marketing (Future)
+##### 1.4.4.5 Marketing (Future)
 - **Scope:** Campaign and lead generation
 - **Features:**
   - Campaign management
@@ -563,7 +618,7 @@ graph TB
   - Email marketing integration
   - Marketing analytics
 
-##### 1.3.4.6 After Sales Service (Future)
+##### 1.4.4.6 After Sales Service (Future)
 - **Scope:** Service and warranty management
 - **Features:**
   - Service requests
@@ -571,9 +626,9 @@ graph TB
   - Service contracts
   - Maintenance schedules
 
-#### 1.3.5 Backoffice Management
+#### 1.4.5 Backoffice Management
 
-##### 1.3.5.1 Company Management
+##### 1.4.5.1 Company Management
 - **PRD Reference:** PRD-06
 - **Scope:** Legal entity and company profile
 - **Features:**
@@ -585,7 +640,7 @@ graph TB
   - Fiscal year definition
   - Multi-currency configuration
 
-##### 1.3.5.2 Office Management
+##### 1.4.5.2 Office Management
 - **PRD Reference:** PRD-07
 - **Scope:** Physical locations and branches
 - **Features:**
@@ -596,7 +651,7 @@ graph TB
   - Warehouse linkage
   - Cost center assignment
 
-##### 1.3.5.3 Department Management
+##### 1.4.5.3 Department Management
 - **PRD Reference:** PRD-08
 - **Scope:** Organizational structure
 - **Features:**
@@ -608,15 +663,15 @@ graph TB
 
 ---
 
-### 1.4 Industry-Based Operations (Layer 3)
+### 1.5 Industry-Based Operations (Layer 3)
 
 **Purpose:** Industry-specific features that can be completely disabled without affecting core modules.
 
 **Status:** 🔮 Future Phases (Post-MVP)
 
-#### 1.4.1 Operations & Services
+#### 1.5.1 Operations & Services
 
-##### 1.4.1.1 Bill of Materials (BOM)
+##### 1.5.1.1 Bill of Materials (BOM)
 - **Scope:** Manufacturing and assembly management
 - **Features:**
   - Multi-level BOM structure
@@ -626,7 +681,7 @@ graph TB
   - Costing rollup
   - Work instructions
 
-##### 1.4.1.2 Metering & Utilities
+##### 1.5.1.2 Metering & Utilities
 - **Scope:** Utility consumption tracking
 - **Features:**
   - Meter reading management
@@ -634,7 +689,7 @@ graph TB
   - Billing integration
   - Anomaly detection
 
-##### 1.4.1.3 Grant Management
+##### 1.5.1.3 Grant Management
 - **Scope:** Non-profit and public sector
 - **Features:**
   - Grant tracking
@@ -642,7 +697,7 @@ graph TB
   - Compliance reporting
   - Milestone tracking
 
-##### 1.4.1.4 Electronic Health Records (EHR/EMR)
+##### 1.5.1.4 Electronic Health Records (EHR/EMR)
 - **Scope:** Healthcare industry
 - **Features:**
   - Patient management
@@ -651,9 +706,9 @@ graph TB
   - Prescription management
   - Billing and insurance
 
-#### 1.4.2 Governance
+#### 1.5.2 Governance
 
-##### 1.4.2.1 Compliance Management
+##### 1.5.2.1 Compliance Management
 - **Scope:** Regulatory compliance tracking
 - **Features:**
   - Compliance checklist
@@ -661,7 +716,7 @@ graph TB
   - Audit preparation
   - Evidence repository
 
-##### 1.4.2.2 Document Management
+##### 1.5.2.2 Document Management
 - **Scope:** Enterprise document control
 - **Features:**
   - Document versioning
@@ -669,7 +724,7 @@ graph TB
   - Access control
   - Retention policies
 
-##### 1.4.2.3 Audit Management
+##### 1.5.2.3 Audit Management
 - **Scope:** Internal audit processes
 - **Features:**
   - Audit planning
@@ -677,9 +732,9 @@ graph TB
   - Corrective actions
   - Audit reports
 
-#### 1.4.3 Strategic
+#### 1.5.3 Strategic
 
-##### 1.4.3.1 Enterprise Performance Management (EPM)
+##### 1.5.3.1 Enterprise Performance Management (EPM)
 - **Scope:** Planning and analytics
 - **Features:**
   - Demand planning
@@ -687,7 +742,7 @@ graph TB
   - Scenario modeling
   - Citizen analytics
 
-##### 1.4.3.2 Enterprise Asset Management (EAM)
+##### 1.5.3.2 Enterprise Asset Management (EAM)
 - **Scope:** Fixed asset lifecycle
 - **Features:**
   - Asset register
@@ -696,7 +751,7 @@ graph TB
   - Fleet management
   - Asset depreciation
 
-##### 1.4.3.3 Analytics & Business Intelligence
+##### 1.5.3.3 Analytics & Business Intelligence
 - **Scope:** Advanced analytics
 - **Features:**
   - Custom dashboards
@@ -1412,4 +1467,3 @@ gantt
 ---
 
 *This document consolidates all MVP requirements while maintaining detailed sub-PRDs for implementation tracking. See [MILESTONE-MAPPING.md](MILESTONE-MAPPING.md) for delivery schedule and issue dependencies.*
-```

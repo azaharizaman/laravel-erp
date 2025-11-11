@@ -44,9 +44,9 @@ Plans must consist of discrete, atomic phases containing executable tasks. Each 
 ## Output File Specifications
 
 - Save implementation plan files in `/plan/` directory
-- Use naming convention: `[PRD number]-[purpose]-[component]-[version].md`
-- Purpose prefixes: `upgrade|refactor|feature|data|infrastructure|process|architecture|design`
-- Example: `PRD-01-upgrade-system-command-4.md`, `PRD-01-feature-auth-module-1.md`
+- Use naming convention: `[PRD number]-[PLAN number]-[purpose].md`
+- Purpose prefixes: `implement|upgrade|refactor|remove|addition|data|infrastructure|process|architecture|design`
+- Example: `PRD01-PLAN01-upgrade-system-command.md`, `PRD01-SUB03-PLAN01-feature-auth-module.md`
 - File must be valid Markdown with proper front matter structure
 
 ## Mandatory Template Structure
@@ -73,7 +73,7 @@ date_created: [YYYY-MM-DD]
 last_updated: [Optional: YYYY-MM-DD]
 owner: [Optional: Team/Individual responsible for this spec]
 status: 'Completed'|'In progress'|'Planned'|'Deprecated'|'On Hold'
-tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`, `chore`, `architecture`, `migration`, `bug` etc]
+tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`, `enhancement`, `architecture`, `migration`, `bug` etc]
 ---
 
 # Introduction
@@ -95,9 +95,14 @@ tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`
 
 ## 2. Implementation Steps
 
-### Implementation Phase 1
+### Implementation Goal 1
 
 - GOAL-001: [Describe the goal of this phase, e.g., "Implement feature X", "Refactor module Y", etc.]
+
+| Requirements Addressed | Description | Completed | Date |
+|------------------------|-------------|-----------|------|
+| FR-02, SR-01      | Description of how this goal addresses the requirements mentioned in the PRd or Sub PRD | ✅ | 2025-04-25 |   
+
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
@@ -105,9 +110,13 @@ tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`
 | TASK-002 | Description of task 2 | |  |
 | TASK-003 | Description of task 3 | |  |
 
-### Implementation Phase 2
+### Implementation Goal 2
 
 - GOAL-002: [Describe the goal of this phase, e.g., "Implement feature X", "Refactor module Y", etc.]
+
+| Requirements Addressed | Description | Completed | Date |
+|------------------------|-------------|-----------|------|
+| FR-04/IR-01      | Description of how this goal addresses the requirements mentioned in the PRd or Sub PRD | ✅ | 2025-04-25 | 
 
 | Task | Description | Completed | Date |
 |------|-------------|-----------|------|
@@ -150,8 +159,8 @@ tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`
 - **RISK-001**: Risk 1
 - **ASSUMPTION-001**: Assumption 1
 
-## 8. Related Specifications / Further Reading
+## 8. Related PRD / Further Reading
 
-[Link to related spec 1]
+[Link to related PRD documents or further reading materials.]
 [Link to relevant external documentation]
 ```
