@@ -86,7 +86,7 @@ class LoginAction
         $user->updateLastLogin();
 
         // Generate API token with configurable expiration
-        $expiresAt = now()->addDays(config('auth.token_expiration_days', 30));
+        $expiresAt = now()->addDays(config('authentication.token_expiration_days', 30));
         $token = $user->createApiToken($deviceName);
 
         // Dispatch login success event
