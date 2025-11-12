@@ -8,6 +8,8 @@ use App\Enums\UomCategory;
 use App\Support\Traits\HasActivityLogging;
 use Azaharizaman\Erp\Core\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -42,6 +44,8 @@ class Uom extends Model
 {
     use BelongsToTenant;
     use HasActivityLogging;
+    use HasFactory;
+    use HasUuids;
     use SoftDeletes;
 
     protected $table = 'uoms';

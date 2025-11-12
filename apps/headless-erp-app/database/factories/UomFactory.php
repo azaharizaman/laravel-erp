@@ -132,7 +132,7 @@ class UomFactory extends Factory
      *
      * @return self
      */
-    public function count(): self
+    public function countCategory(): self
     {
         return $this->forCategory(UomCategory::COUNT);
     }
