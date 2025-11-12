@@ -11,12 +11,10 @@ declare(strict_types=1);
 | across all apps and packages in the monorepo. Each app/package has its own
 | test suite that can be run independently or as part of the full suite.
 |
+| Note: This file is not actively used since we run tests directly from
+| app/package directories. It's here for future root-level integration tests.
+|
 */
-
-use Pest\TestSuite;
-
-// Configure Pest to discover tests in apps and packages
-pest()->extend(Tests\TestCase::class)->in('.');
 
 /*
 |--------------------------------------------------------------------------

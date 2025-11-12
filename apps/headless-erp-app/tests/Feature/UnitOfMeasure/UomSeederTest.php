@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\UomCategory;
 use App\Models\Uom;
+use Azaharizaman\Erp\Core\Models\Tenant;
 use Database\Seeders\UomSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -73,11 +74,12 @@ test('UomSeeder marks UOMs as system with null tenant_id', function () {
 // ============================================================================
 
 test('unique constraint prevents duplicate UOM codes within tenant', function () {
-    $tenant1Id = \Illuminate\Support\Str::uuid();
-    $tenant2Id = \Illuminate\Support\Str::uuid();
+    // Use factory to create tenants that actually exist
+    $tenant1 = Tenant::factory()->create();
+    $tenant2 = Tenant::factory()->create();
 
     Uom::create([
-        'tenant_id' => $tenant1Id,
+        'tenant_id' => $tenant1->id,
         'code' => 'CUSTOM-M',
         'name' => 'Custom Meter',
         'symbol' => 'cm',
@@ -88,7 +90,7 @@ test('unique constraint prevents duplicate UOM codes within tenant', function ()
 
     // Same code in different tenant should be allowed
     $uom2 = Uom::create([
-        'tenant_id' => $tenant2Id,
+        'tenant_id' => $tenant2->id,
         'code' => 'CUSTOM-M',
         'name' => 'Different Custom Meter',
         'symbol' => 'cm2',
@@ -103,10 +105,10 @@ test('unique constraint prevents duplicate UOM codes within tenant', function ()
 test('tenant can have custom UOMs alongside system UOMs', function () {
     $this->seed(UomSeeder::class);
 
-    $tenantId = \Illuminate\Support\Str::uuid();
+    $tenant = Tenant::factory()->create();
 
     Uom::create([
-        'tenant_id' => $tenantId,
+        'tenant_id' => $tenant->id,
         'code' => 'CUSTOM-UNIT',
         'name' => 'Custom Unit',
         'symbol' => 'cu',
@@ -116,7 +118,7 @@ test('tenant can have custom UOMs alongside system UOMs', function () {
     ]);
 
     $systemUoms = Uom::system()->count();
-    $customUoms = Uom::where('tenant_id', $tenantId)->custom()->count();
+    $customUoms = Uom::where('tenant_id', $tenant->id)->custom()->count();
     $total = Uom::count();
 
     expect($systemUoms)->toBe(41);

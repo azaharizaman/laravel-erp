@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('category')->comment('Category: LENGTH, MASS, VOLUME, AREA, COUNT, TIME');
 
             // Conversion factors with high precision
-            $table->decimal('conversion_factor', precision: 20, places: 10)
+            $table->decimal('conversion_factor', 20, 10)
                 ->default(1)
                 ->comment('Conversion factor to base unit (20 digits, 10 decimals)');
 
