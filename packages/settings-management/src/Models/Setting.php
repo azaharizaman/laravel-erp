@@ -180,7 +180,7 @@ class Setting extends Model
      * @param string $scope
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOfScope($query, string $scope)
+    public function scopeOfScope($query, string $scope): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('scope', $scope);
     }
@@ -192,7 +192,7 @@ class Setting extends Model
      * @param string $moduleName
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeForModule($query, string $moduleName)
+    public function scopeForModule($query, string $moduleName): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('module_name', $moduleName);
     }
@@ -204,7 +204,7 @@ class Setting extends Model
      * @param int $userId
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeForUser($query, int $userId)
+    public function scopeForUser($query, int $userId): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('user_id', $userId);
     }

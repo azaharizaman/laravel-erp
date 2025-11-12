@@ -329,6 +329,11 @@ class SettingsService implements SettingsServiceContract
     /**
      * Invalidate cache for a setting key
      *
+     * When a setting is updated at any scope, we need to invalidate all cache entries
+     * that might have resolved to that setting through hierarchical resolution.
+     * Due to the complexity of tracking all possible cache key combinations (tenant_id,
+     * module_name, user_id), we use cache tags or flush by pattern where possible.
+     *
      * @param string $key The setting key
      * @param string|null $scope Optional specific scope to invalidate
      * @return void
@@ -339,28 +344,39 @@ class SettingsService implements SettingsServiceContract
             return;
         }
 
-        $cacheKeys = [];
-
-        if ($scope !== null) {
-            // Invalidate specific scope and all parent scopes
-            $scopes = $this->getScopesForHierarchy($scope);
-            foreach ($scopes as $s) {
-                $cacheKeys[] = $this->getCacheKey($key, $s);
+        // For comprehensive invalidation, we need to clear all possible cache key combinations
+        // Since we cannot enumerate all tenant_id/module_name/user_id combinations efficiently,
+        // we invalidate by pattern matching on the cache key prefix
+        
+        $prefix = config('settings-management.cache.prefix', 'settings');
+        $pattern = "{$prefix}:{$key}:*";
+        
+        // Use cache driver's flush by pattern if available (Redis supports this)
+        // For other cache drivers, we fall back to invalidating known scopes
+        $cacheDriver = config('settings-management.cache.driver') ?? config('cache.default');
+        
+        if ($cacheDriver === 'redis') {
+            // Redis: use pattern matching to clear all related keys
+            $redis = Cache::getRedis();
+            $keys = $redis->keys($pattern);
+            if (!empty($keys)) {
+                $redis->del($keys);
             }
+            $invalidatedKeys = $keys;
         } else {
-            // Invalidate all scopes
+            // Fallback: invalidate all scope combinations without specific IDs
             $allScopes = config('settings-management.scope_hierarchy', ['user', 'module', 'tenant', 'system']);
+            $invalidatedKeys = [];
+            
             foreach ($allScopes as $s) {
-                $cacheKeys[] = $this->getCacheKey($key, $s);
+                $cacheKey = $this->getCacheKey($key, $s);
+                Cache::forget($cacheKey);
+                $invalidatedKeys[] = $cacheKey;
             }
-        }
-
-        foreach ($cacheKeys as $cacheKey) {
-            Cache::forget($cacheKey);
         }
 
         // Dispatch event
-        event(new CacheInvalidatedEvent($cacheKeys, "Setting '{$key}' updated"));
+        event(new CacheInvalidatedEvent($invalidatedKeys, "Setting '{$key}' updated"));
     }
 
     /**

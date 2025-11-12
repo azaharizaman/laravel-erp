@@ -130,7 +130,7 @@ class SettingHistory extends Model
      * @param int $settingId
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeForSetting($query, int $settingId)
+    public function scopeForSetting($query, int $settingId): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('setting_id', $settingId);
     }
@@ -142,7 +142,7 @@ class SettingHistory extends Model
      * @param string $key
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeForKey($query, string $key)
+    public function scopeForKey($query, string $key): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('key', $key);
     }
@@ -154,7 +154,7 @@ class SettingHistory extends Model
      * @param string $action
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeOfAction($query, string $action)
+    public function scopeOfAction($query, string $action): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('action', $action);
     }
