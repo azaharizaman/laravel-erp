@@ -5,11 +5,39 @@
          colors="true"
 >
     <testsuites>
+        <!-- Root-level tests -->
+        <testsuite name="Root">
+            <directory>tests</directory>
+        </testsuite>
+        
+        <!-- App tests -->
+        <testsuite name="HeadlessErpApp">
+            <directory>apps/headless-erp-app/tests</directory>
+        </testsuite>
+        
+        <!-- Package tests -->
+        <testsuite name="AuditLogging">
+            <directory>packages/audit-logging/tests</directory>
+        </testsuite>
+        <testsuite name="SerialNumbering">
+            <directory>packages/serial-numbering/tests</directory>
+        </testsuite>
+        <testsuite name="SettingsManagement">
+            <directory>packages/settings-management/tests</directory>
+        </testsuite>
+        
+        <!-- Legacy test organization (backward compatibility) -->
         <testsuite name="Unit">
-            <directory>tests/Unit</directory>
+            <directory>apps/headless-erp-app/tests/Unit</directory>
+            <directory>packages/*/tests/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory>apps/headless-erp-app/tests/Feature</directory>
+            <directory>packages/*/tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>apps/headless-erp-app/tests/Integration</directory>
+            <directory>packages/*/tests/Integration</directory>
         </testsuite>
     </testsuites>
     <source>
