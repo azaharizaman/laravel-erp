@@ -40,8 +40,6 @@ class UomNotFoundException extends UomConversionException
 
     /**
      * Get the UOM code that was not found
-     *
-     * @return string
      */
     public function getUomCode(): string
     {

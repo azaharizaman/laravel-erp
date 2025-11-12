@@ -55,8 +55,6 @@ class IncompatibleUomException extends UomConversionException
 
     /**
      * Get source category
-     *
-     * @return string
      */
     public function getFromCategory(): string
     {
@@ -65,8 +63,6 @@ class IncompatibleUomException extends UomConversionException
 
     /**
      * Get target category
-     *
-     * @return string
      */
     public function getToCategory(): string
     {

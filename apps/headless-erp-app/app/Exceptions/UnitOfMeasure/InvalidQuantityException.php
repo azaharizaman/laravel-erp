@@ -51,8 +51,6 @@ class InvalidQuantityException extends UomConversionException
 
     /**
      * Get the invalid quantity
-     *
-     * @return string
      */
     public function getQuantity(): string
     {
@@ -61,8 +59,6 @@ class InvalidQuantityException extends UomConversionException
 
     /**
      * Get the reason for invalidity
-     *
-     * @return string
      */
     public function getReason(): string
     {

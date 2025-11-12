@@ -9,7 +9,6 @@ use App\Services\UnitOfMeasure\UomConversionService;
 use Brick\Math\BigDecimal;
 use Brick\Math\Exception\MathException;
 use Illuminate\Console\Command;
-use Illuminate\Container\Attributes\Bind;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -56,6 +55,7 @@ class ConvertQuantityAction
      * @param  string  $toUomCode  Target UOM code
      * @param  string|null  $tenantId  Tenant ID (optional)
      * @return array<string, string> Conversion result with keys: quantity, from_uom, to_uom, conversion_factor
+     *
      * @throws InvalidQuantityException If quantity is invalid
      */
     public function handle(
@@ -120,7 +120,6 @@ class ConvertQuantityAction
      * Usage: php artisan uom:convert 100 kg lb
      *
      * @param  Command  $command  Command instance
-     * @return void
      */
     public function asCommand(Command $command): void
     {
@@ -141,14 +140,12 @@ class ConvertQuantityAction
 
             $command->line(sprintf('Conversion factor: %s', $result['conversion_factor']));
         } catch (\Exception $e) {
-            $command->error('Conversion failed: ' . $e->getMessage());
+            $command->error('Conversion failed: '.$e->getMessage());
         }
     }
 
     /**
      * Get command signature
-     *
-     * @return string
      */
     public function getCommandSignature(): string
     {
@@ -157,8 +154,6 @@ class ConvertQuantityAction
 
     /**
      * Get command description
-     *
-     * @return string
      */
     public function getCommandDescription(): string
     {
@@ -177,8 +172,6 @@ class ConvertQuantityAction
 
     /**
      * Get job retry attempts
-     *
-     * @return int
      */
     public function getJobRetries(): int
     {
@@ -189,7 +182,7 @@ class ConvertQuantityAction
      * Validate quantity value
      *
      * @param  string  $quantity  Quantity to validate
-     * @return void
+     *
      * @throws InvalidQuantityException If quantity is invalid
      */
     protected function validateQuantity(string $quantity): void
@@ -264,7 +257,6 @@ class ConvertQuantityAction
      *
      * @param  string  $fromUomCode  Source UOM code
      * @param  string  $toUomCode  Target UOM code
-     * @return void
      */
     public static function clearCache(string $fromUomCode, string $toUomCode): void
     {

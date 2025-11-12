@@ -7,7 +7,6 @@ namespace App\Actions\UnitOfMeasure;
 use App\Contracts\UomRepositoryContract;
 use App\Exceptions\UnitOfMeasure\UomNotFoundException;
 use App\Models\Uom;
-use Illuminate\Container\Attributes\Bind;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -45,6 +44,7 @@ class GetCompatibleUomsAction
      * @param  Uom|string  $uom  Reference UOM (model or code)
      * @param  string|null  $tenantId  Tenant ID for scoping (optional)
      * @return Collection Collection of compatible Uom models
+     *
      * @throws UomNotFoundException If UOM code is not found
      */
     public function handle(Uom|string $uom, ?string $tenantId = null): Collection
@@ -78,7 +78,6 @@ class GetCompatibleUomsAction
      *
      * @param  string  $category  Category value
      * @param  string|null  $tenantId  Tenant ID
-     * @return void
      */
     public static function clearCache(string $category, ?string $tenantId = null): void
     {

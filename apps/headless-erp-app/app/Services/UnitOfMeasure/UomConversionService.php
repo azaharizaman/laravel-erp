@@ -10,7 +10,6 @@ use App\Exceptions\UnitOfMeasure\UomNotFoundException;
 use App\Models\Uom;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
-use Illuminate\Container\Attributes\Bind;
 
 /**
  * UOM Conversion Service
@@ -45,8 +44,9 @@ class UomConversionService
      * @param  Uom|string  $fromUom  Source unit (Uom model or code string)
      * @param  Uom|string  $toUom  Target unit (Uom model or code string)
      * @param  int|null  $precision  Decimal precision (null = use target UOM's precision)
-     * @param  int  $roundingMode  Rounding mode (default: HALF_UP)
+     * @param  RoundingMode  $roundingMode  Rounding mode (default: HALF_UP)
      * @return string String representation of converted quantity (preserves precision)
+     *
      * @throws UomNotFoundException If either UOM code is not found
      * @throws IncompatibleUomException If UOMs are from different categories
      */
@@ -55,7 +55,7 @@ class UomConversionService
         Uom|string $fromUom,
         Uom|string $toUom,
         ?int $precision = null,
-        int $roundingMode = RoundingMode::HALF_UP
+        RoundingMode $roundingMode = RoundingMode::HALF_UP
     ): string {
         // Resolve UOM models from codes if strings provided
         $from = $this->resolveUom($fromUom);
@@ -91,14 +91,15 @@ class UomConversionService
      *
      * @param  string|BigDecimal  $quantity  Quantity to convert
      * @param  Uom|string  $uom  Source UOM
-     * @param  int  $roundingMode  Rounding mode (default: HALF_UP)
+     * @param  RoundingMode  $roundingMode  Rounding mode (default: HALF_UP)
      * @return string String representation of base unit quantity
+     *
      * @throws UomNotFoundException If UOM code is not found
      */
     public function convertToBaseUnit(
         string|BigDecimal $quantity,
         Uom|string $uom,
-        int $roundingMode = RoundingMode::HALF_UP
+        RoundingMode $roundingMode = RoundingMode::HALF_UP
     ): string {
         $resolvedUom = $this->resolveUom($uom);
 
@@ -120,15 +121,16 @@ class UomConversionService
      * @param  string|BigDecimal  $baseQuantity  Quantity in base unit
      * @param  Uom|string  $targetUom  Target UOM
      * @param  int|null  $precision  Decimal precision (null = use UOM's precision, default: 10)
-     * @param  int  $roundingMode  Rounding mode (default: HALF_UP)
+     * @param  RoundingMode  $roundingMode  Rounding mode (default: HALF_UP)
      * @return string String representation of converted quantity
+     *
      * @throws UomNotFoundException If UOM code is not found
      */
     public function convertFromBaseUnit(
         string|BigDecimal $baseQuantity,
         Uom|string $targetUom,
         ?int $precision = null,
-        int $roundingMode = RoundingMode::HALF_UP
+        RoundingMode $roundingMode = RoundingMode::HALF_UP
     ): string {
         $resolvedUom = $this->resolveUom($targetUom);
 
@@ -147,6 +149,7 @@ class UomConversionService
      *
      * @param  Uom|string  $uom  UOM model or code string
      * @return Uom Resolved UOM model
+     *
      * @throws UomNotFoundException If UOM code is not found
      */
     protected function resolveUom(Uom|string $uom): Uom

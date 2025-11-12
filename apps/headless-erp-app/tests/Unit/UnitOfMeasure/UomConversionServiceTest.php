@@ -25,7 +25,7 @@ beforeEach(function () {
         'category' => UomCategory::MASS,
         'conversion_factor' => '1.0',
     ]);
-    
+
     Uom::factory()->system()->create([
         'code' => 'lb',
         'name' => 'Pound',
@@ -33,7 +33,7 @@ beforeEach(function () {
         'category' => UomCategory::MASS,
         'conversion_factor' => '0.45359237',
     ]);
-    
+
     // Length category
     Uom::factory()->system()->create([
         'code' => 'm',
@@ -42,7 +42,7 @@ beforeEach(function () {
         'category' => UomCategory::LENGTH,
         'conversion_factor' => '1.0',
     ]);
-    
+
     Uom::factory()->system()->create([
         'code' => 'km',
         'name' => 'Kilometer',
@@ -50,7 +50,7 @@ beforeEach(function () {
         'category' => UomCategory::LENGTH,
         'conversion_factor' => '1000.0',
     ]);
-    
+
     // Volume category
     Uom::factory()->system()->create([
         'code' => 'L',
@@ -59,7 +59,7 @@ beforeEach(function () {
         'category' => UomCategory::VOLUME,
         'conversion_factor' => '1.0',
     ]);
-    
+
     Uom::factory()->system()->create([
         'code' => 'mL',
         'name' => 'Milliliter',
@@ -67,6 +67,13 @@ beforeEach(function () {
         'category' => UomCategory::VOLUME,
         'conversion_factor' => '0.001',
     ]);
+
+    // Helper function to create service
+    $this->createService = function () {
+        $repository = app(UomRepositoryContract::class);
+
+        return new UomConversionService($repository);
+    };
 });
 
 // ============================================================================
@@ -74,7 +81,7 @@ beforeEach(function () {
 // ============================================================================
 
 test('converts mass units accurately using BigDecimal', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // 100 kg to lb (should be approximately 220.462 lb)
     $result = $service->convert('100', 'kg', 'lb', 3);
@@ -90,7 +97,7 @@ test('converts mass units accurately using BigDecimal', function () {
 });
 
 test('converts length units accurately', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // 1000 m to km (should be 1 km)
     $result = $service->convert('1000', 'm', 'km', 3);
@@ -99,7 +106,7 @@ test('converts length units accurately', function () {
 });
 
 test('converts volume units accurately', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // 1 L to mL (should be 1000 mL)
     $result = $service->convert('1', 'L', 'mL', 0);
@@ -108,7 +115,7 @@ test('converts volume units accurately', function () {
 });
 
 test('direct conversion returns input unchanged', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $result = $service->convert('100.5', 'kg', 'kg', 2);
 
@@ -116,7 +123,7 @@ test('direct conversion returns input unchanged', function () {
 });
 
 test('bidirectional conversion maintains precision', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // Convert kg -> lb -> kg
     $original = '100';
@@ -136,7 +143,7 @@ test('bidirectional conversion maintains precision', function () {
 // ============================================================================
 
 test('converts to base unit correctly', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // 100 lb to kg (base unit for mass)
     // 1 lb = 0.45359237 kg
@@ -150,7 +157,7 @@ test('converts to base unit correctly', function () {
 });
 
 test('converts from base unit correctly', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // 45.359237 kg to lb
     $result = $service->convertFromBaseUnit('45.359237', 'lb', 3);
@@ -167,13 +174,13 @@ test('converts from base unit correctly', function () {
 // ============================================================================
 
 test('throws exception for incompatible categories', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $service->convert('100', 'kg', 'm');
 })->throws(IncompatibleUomException::class, 'Cannot convert between incompatible categories: MASS and LENGTH');
 
 test('throws exception for non-existent UOM code', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $service->convert('100', 'xyz', 'kg');
 })->throws(UomNotFoundException::class, 'Unit of measure not found: xyz');
@@ -198,7 +205,7 @@ test('UomNotFoundException has correct HTTP code', function () {
 // ============================================================================
 
 test('applies HALF_UP rounding correctly', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // Create a test case that requires rounding
     $result = $service->convert('10.666666', 'kg', 'kg', 2, RoundingMode::HALF_UP);
@@ -207,7 +214,7 @@ test('applies HALF_UP rounding correctly', function () {
 });
 
 test('applies FLOOR rounding correctly', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $result = $service->convert('10.666666', 'kg', 'kg', 2, RoundingMode::FLOOR);
 
@@ -215,7 +222,7 @@ test('applies FLOOR rounding correctly', function () {
 });
 
 test('applies CEILING rounding correctly', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $result = $service->convert('10.661111', 'kg', 'kg', 2, RoundingMode::CEILING);
 
@@ -227,7 +234,7 @@ test('applies CEILING rounding correctly', function () {
 // ============================================================================
 
 test('handles very large numbers without precision loss', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $largeNumber = '1000000000000000'; // 1e15
     $result = $service->convert($largeNumber, 'kg', 'kg', 0);
@@ -236,7 +243,7 @@ test('handles very large numbers without precision loss', function () {
 });
 
 test('handles very small numbers accurately', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $smallNumber = '0.0000000001'; // 1e-10
     $result = $service->convert($smallNumber, 'kg', 'kg', 10);
@@ -245,7 +252,7 @@ test('handles very small numbers accurately', function () {
 });
 
 test('accepts BigDecimal as input', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $quantity = BigDecimal::of('100.5');
     $result = $service->convert($quantity, 'kg', 'lb', 3);
@@ -258,7 +265,7 @@ test('accepts BigDecimal as input', function () {
 });
 
 test('uses target UOM precision when not specified', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // Convert and check that result uses default precision (10 decimals max)
     $result = $service->convert('100', 'kg', 'lb');
@@ -272,7 +279,7 @@ test('uses target UOM precision when not specified', function () {
 // ============================================================================
 
 test('conversion completes within performance threshold', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $startTime = microtime(true);
 
@@ -291,7 +298,7 @@ test('conversion completes within performance threshold', function () {
 // ============================================================================
 
 test('result preserves precision as string', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     $result = $service->convert('100', 'kg', 'lb', 10);
 
@@ -301,7 +308,7 @@ test('result preserves precision as string', function () {
 });
 
 test('no precision loss in multi-decimal operations', function () {
-    $service = app(UomConversionService::class);
+    $service = ($this->createService)();
 
     // Use a value with many decimals
     $quantity = '100.1234567890123456789';

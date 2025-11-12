@@ -6,7 +6,6 @@ use App\Actions\UnitOfMeasure\ConvertQuantityAction;
 use App\Actions\UnitOfMeasure\GetCompatibleUomsAction;
 use App\Actions\UnitOfMeasure\ValidateUomCompatibilityAction;
 use App\Enums\UomCategory;
-use App\Exceptions\UnitOfMeasure\IncompatibleUomException;
 use App\Exceptions\UnitOfMeasure\InvalidQuantityException;
 use App\Exceptions\UnitOfMeasure\UomNotFoundException;
 use App\Models\Uom;
@@ -26,7 +25,7 @@ beforeEach(function () {
         'category' => UomCategory::MASS,
         'conversion_factor' => '1.0',
     ]);
-    
+
     Uom::factory()->system()->create([
         'code' => 'lb',
         'name' => 'Pound',
@@ -34,7 +33,7 @@ beforeEach(function () {
         'category' => UomCategory::MASS,
         'conversion_factor' => '0.45359237',
     ]);
-    
+
     // Length category
     Uom::factory()->system()->create([
         'code' => 'm',
@@ -318,7 +317,7 @@ test('cache hit rate above 90 percent', function () {
     // Remaining calls should hit cache
     for ($i = 0; $i < $total - 1; $i++) {
         // Different quantities but same conversion pair
-        $action->handle((string) ($100 + $i), 'kg', 'lb');
+        $action->handle((string) (100 + $i), 'kg', 'lb');
 
         if (Cache::has('uom:conversion:kg:lb')) {
             $hits++;

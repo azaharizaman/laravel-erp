@@ -33,8 +33,6 @@ class UomConversionException extends RuntimeException
 
     /**
      * Get HTTP status code for this exception
-     *
-     * @return int
      */
     public function getHttpStatusCode(): int
     {
@@ -44,7 +42,6 @@ class UomConversionException extends RuntimeException
     /**
      * Set HTTP status code
      *
-     * @param  int  $code
      * @return $this
      */
     public function setHttpStatusCode(int $code): self

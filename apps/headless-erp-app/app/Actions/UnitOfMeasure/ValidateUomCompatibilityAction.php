@@ -6,7 +6,6 @@ namespace App\Actions\UnitOfMeasure;
 
 use App\Contracts\UomRepositoryContract;
 use App\Models\Uom;
-use Illuminate\Container\Attributes\Bind;
 
 /**
  * Validate UOM Compatibility Action
