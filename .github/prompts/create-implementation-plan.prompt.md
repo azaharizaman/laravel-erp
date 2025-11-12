@@ -10,7 +10,7 @@ You are well verse in this project purpose, hierarchy and concept, mission & vis
 
 ## Execution Context
 
-This prompt is designed for AI-to-AI communication and automated processing. All instructions must be interpreted literally and executed systematically without human interpretation or clarification. Since you will likely hit your response length limit, you must break your response into multiple parts, ensuring each part is complete and coherent. To ensure all parts are correctly sequenced, include a part number and total parts at the beginning of each response (e.g., "Part 1 of 3").
+This prompt is designed for AI-to-AI communication and automated processing. All instructions must be interpreted literally and executed systematically without human interpretation or clarification. Since you will likely hit your response length limit, you must break your response into multiple parts, ensuring each part is complete and coherent. To ensure all parts are correctly sequenced, include a part number and total parts at the beginning of each response (e.g., "Part 1 of 3"). When working to create this plan files, you are not required to report back to me the summary of the PRD or Sub PRD, you just need to create the plan files based on your understanding of the PRD or Sub PRD and list out the created plan files at the end of your final response. No summary or explanation is needed.
 
 ## Core Requirements
 
