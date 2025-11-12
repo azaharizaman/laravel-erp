@@ -86,7 +86,7 @@ class DatabaseUomRepository implements UomRepositoryContract
     public function create(array $data): Uom
     {
         // System UOMs should have null tenant_id to be globally available
-        if (isset($data['is_system']) && $data['is_system'] === true) {
+        if (!empty($data['is_system'])) {
             $data['tenant_id'] = null;
         }
 
