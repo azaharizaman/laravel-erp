@@ -6,8 +6,13 @@ namespace Azaharizaman\Erp\Core;
 
 use Azaharizaman\Erp\Core\Contracts\TenantManagerContract;
 use Azaharizaman\Erp\Core\Contracts\TenantRepositoryContract;
+use Azaharizaman\Erp\Core\Http\Middleware\EnsureTenantActive;
+use Azaharizaman\Erp\Core\Middleware\IdentifyTenant;
+use Azaharizaman\Erp\Core\Models\Tenant;
 use Azaharizaman\Erp\Core\Repositories\TenantRepository;
+use Azaharizaman\Erp\Core\Services\ImpersonationService;
 use Azaharizaman\Erp\Core\Services\TenantManager;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -20,22 +25,27 @@ class CoreServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
-     *
-     * @return void
      */
     public function register(): void
     {
+        // Merge package configuration
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/erp-core.php',
+            'erp-core'
+        );
+
         // Bind TenantRepository contract to implementation
         $this->app->singleton(TenantRepositoryContract::class, TenantRepository::class);
 
         // Bind TenantManager contract to implementation
         $this->app->singleton(TenantManagerContract::class, TenantManager::class);
+
+        // Bind ImpersonationService
+        $this->app->singleton(ImpersonationService::class);
     }
 
     /**
      * Bootstrap services.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -46,8 +56,52 @@ class CoreServiceProvider extends ServiceProvider
 
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        
-        // Load routes if needed
-        // $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
+        // Load routes
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
+        // Register middleware aliases
+        $router = $this->app['router'];
+        $router->aliasMiddleware('tenant', IdentifyTenant::class);
+        $router->aliasMiddleware('tenant.active', EnsureTenantActive::class);
+
+        // Define Gates for tenant management
+        Gate::define('view-tenants', function ($user) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('view-tenant', function ($user, Tenant $tenant) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('create-tenant', function ($user) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('update-tenant', function ($user, Tenant $tenant) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('suspend-tenant', function ($user, Tenant $tenant) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('activate-tenant', function ($user, Tenant $tenant) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('archive-tenant', function ($user, Tenant $tenant) {
+            return $user->hasRole('admin');
+        });
+
+        Gate::define('delete-tenant', function ($user, Tenant $tenant) {
+            return $user->hasRole('admin');
+        });
+
+        // Define Gate for tenant impersonation
+        Gate::define('impersonate-tenant', function ($user, Tenant $tenant) {
+            // Allow users with 'admin' or 'support' role to impersonate
+            return $user->hasRole('admin') || $user->hasRole('support');
+        });
     }
 }
