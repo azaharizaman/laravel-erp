@@ -162,7 +162,18 @@ composer install
     - Added nexus/contracts dependency
     - Bulk replaced all namespaces (AzahariZaman\BackOffice → Nexus\BackofficeManagement)
   - Ready for Phase 4 (create new atomic packages)
-- [ ] **Checkpoint 4:** New atomic packages created
+- [x] **Checkpoint 4:** New atomic packages created ✅ **PARTIAL** (Nov 13, 2025)
+  - Created nexus-tenancy-management package
+    - Extracted all tenant-related functionality from core
+    - 34 PHP files: Models, Services, Actions, Events, Policies, Middleware
+    - composer.json: nexus/tenancy-management, Nexus\TenancyManagement namespace
+    - Dependencies: nexus/contracts, lorisleiva/laravel-actions
+    - Includes: Tenant model, TenantManager, Impersonation service, BelongsToTenant trait
+  - Decided NOT to create nexus-identity-management
+    - User model belongs in main application (Laravel convention)
+    - Authentication logic will remain in main app
+    - Core package serves as orchestrator (exempt from atomicity)
+  - Ready for Phase 5 (update main application)
 - [ ] **Checkpoint 5:** Main application updated
 - [ ] **Checkpoint 6:** Tests passing
 - [ ] **Checkpoint 7:** Documentation complete
