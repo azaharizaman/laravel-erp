@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Traits;
+namespace Nexus\Core\Traits;
 
-use Nexus\Erp\Core\Models\Tenant;
-use Nexus\Erp\Core\Scopes\TenantScope;
+use Nexus\Core\Models\Tenant;
+use Nexus\Core\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

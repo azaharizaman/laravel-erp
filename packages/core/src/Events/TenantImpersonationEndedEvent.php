@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Events;
+namespace Nexus\Core\Events;
 
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Models\Tenant;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;

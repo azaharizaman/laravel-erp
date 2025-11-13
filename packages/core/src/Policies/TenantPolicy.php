@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Policies;
+namespace Nexus\Core\Policies;
 
 use App\Models\User;
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Models\Tenant;
 
 /**
  * Tenant Policy

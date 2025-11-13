@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Contracts;
+namespace Nexus\Core\Contracts;
 
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Models\Tenant;
 
 /**
  * Tenant Manager Contract

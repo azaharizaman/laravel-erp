@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Services;
+namespace Nexus\Core\Services;
 
 use App\Support\Contracts\ActivityLoggerContract;
-use Nexus\Erp\Core\Contracts\TenantManagerContract;
-use Nexus\Erp\Core\Contracts\TenantRepositoryContract;
-use Nexus\Erp\Core\Enums\TenantStatus;
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Contracts\TenantManagerContract;
+use Nexus\Core\Contracts\TenantRepositoryContract;
+use Nexus\Core\Enums\TenantStatus;
+use Nexus\Core\Models\Tenant;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Actions;
+namespace Nexus\Core\Actions;
 
-use Nexus\Erp\Core\Contracts\TenantRepositoryContract;
-use Nexus\Erp\Core\Enums\TenantStatus;
-use Nexus\Erp\Core\Events\TenantCreatedEvent;
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Contracts\TenantRepositoryContract;
+use Nexus\Core\Enums\TenantStatus;
+use Nexus\Core\Events\TenantCreatedEvent;
+use Nexus\Core\Models\Tenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;

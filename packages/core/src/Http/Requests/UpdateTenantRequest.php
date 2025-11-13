@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Http\Requests;
+namespace Nexus\Core\Http\Requests;
 
-use Nexus\Erp\Core\Enums\TenantStatus;
+use Nexus\Core\Enums\TenantStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

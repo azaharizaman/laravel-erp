@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Actions;
+namespace Nexus\Core\Actions;
 
 use App\Models\User;
-use Nexus\Erp\Core\Services\ImpersonationService;
+use Nexus\Core\Services\ImpersonationService;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**

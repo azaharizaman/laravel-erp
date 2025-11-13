@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Actions;
+namespace Nexus\Core\Actions;
 
 use App\Support\Contracts\ActivityLoggerContract;
-use Nexus\Erp\Core\Contracts\TenantRepositoryContract;
-use Nexus\Erp\Core\Enums\TenantStatus;
-use Nexus\Erp\Core\Events\TenantArchivedEvent;
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Contracts\TenantRepositoryContract;
+use Nexus\Core\Enums\TenantStatus;
+use Nexus\Core\Events\TenantArchivedEvent;
+use Nexus\Core\Models\Tenant;
 use Illuminate\Console\Command;
 use Lorisleiva\Actions\Concerns\AsAction;
 

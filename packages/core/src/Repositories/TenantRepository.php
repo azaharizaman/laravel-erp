@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Repositories;
+namespace Nexus\Core\Repositories;
 
-use Nexus\Erp\Core\Contracts\TenantRepositoryContract;
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Contracts\TenantRepositoryContract;
+use Nexus\Core\Models\Tenant;
 use Illuminate\Database\Eloquent\Collection;
 
 /**

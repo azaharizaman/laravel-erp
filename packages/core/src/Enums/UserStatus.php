@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Enums;
+namespace Nexus\Core\Enums;
 
 enum UserStatus: string
 {

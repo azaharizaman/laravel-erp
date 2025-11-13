@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Actions;
+namespace Nexus\Core\Actions;
 
 use App\Models\User;
-use Nexus\Erp\Core\Models\Tenant;
-use Nexus\Erp\Core\Services\ImpersonationService;
+use Nexus\Core\Models\Tenant;
+use Nexus\Core\Services\ImpersonationService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Lorisleiva\Actions\Concerns\AsAction;
 

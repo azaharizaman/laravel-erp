@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Http\Middleware;
+namespace Nexus\Core\Http\Middleware;
 
-use Nexus\Erp\Core\Contracts\TenantManagerContract;
-use Nexus\Erp\Core\Enums\TenantStatus;
+use Nexus\Core\Contracts\TenantManagerContract;
+use Nexus\Core\Enums\TenantStatus;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

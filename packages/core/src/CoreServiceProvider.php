@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core;
+namespace Nexus\Core;
 
-use Nexus\Erp\Core\Contracts\TenantManagerContract;
-use Nexus\Erp\Core\Contracts\TenantRepositoryContract;
-use Nexus\Erp\Core\Http\Middleware\EnsureTenantActive;
-use Nexus\Erp\Core\Middleware\IdentifyTenant;
-use Nexus\Erp\Core\Models\Tenant;
-use Nexus\Erp\Core\Repositories\TenantRepository;
-use Nexus\Erp\Core\Services\ImpersonationService;
-use Nexus\Erp\Core\Services\TenantManager;
+use Nexus\Core\Contracts\TenantManagerContract;
+use Nexus\Core\Contracts\TenantRepositoryContract;
+use Nexus\Core\Http\Middleware\EnsureTenantActive;
+use Nexus\Core\Middleware\IdentifyTenant;
+use Nexus\Core\Models\Tenant;
+use Nexus\Core\Repositories\TenantRepository;
+use Nexus\Core\Services\ImpersonationService;
+use Nexus\Core\Services\TenantManager;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 

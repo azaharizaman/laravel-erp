@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Core\Listeners;
+namespace Nexus\Core\Listeners;
 
-use Nexus\Erp\Core\Events\TenantCreatedEvent;
-use Nexus\Erp\Core\Models\Tenant;
+use Nexus\Core\Events\TenantCreatedEvent;
+use Nexus\Core\Models\Tenant;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
