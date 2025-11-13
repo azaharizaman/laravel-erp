@@ -717,7 +717,7 @@ class Staff extends Model
         ?Carbon $effectiveDate = null,
         ?Department $toDepartment = null,
         ?Staff $toSupervisor = null,
-        ?string $toPosition = null,
+        ?Position $toPosition = null,
         ?string $reason = null,
         bool $isImmediate = false
     ): StaffTransfer {
@@ -732,8 +732,8 @@ class Staff extends Model
             'to_department_id' => $toDepartment?->id,
             'from_supervisor_id' => $this->supervisor_id,
             'to_supervisor_id' => $toSupervisor?->id,
-            'from_position' => $this->position,
-            'to_position' => $toPosition,
+            'from_position_id' => $this->position_id,
+            'to_position_id' => $toPosition?->id,
             'effective_date' => $effectiveDate ?? ($isImmediate ? now() : now()->addDays(30)),
             'requested_by_id' => $requestedBy->id,
             'reason' => $reason,
@@ -752,7 +752,7 @@ class Staff extends Model
         Staff $requestedBy,
         ?Department $toDepartment = null,
         ?Staff $toSupervisor = null,
-        ?string $toPosition = null,
+        ?Position $toPosition = null,
         ?string $reason = null
     ): StaffTransfer {
         return $this->requestTransfer(

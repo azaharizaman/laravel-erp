@@ -80,7 +80,7 @@ class OrganizationalChart
                 'supervisor' => $staff->supervisor ? [
                     'id' => $staff->supervisor->id,
                     'name' => $staff->supervisor->full_name,
-                    'position' => $staff->supervisor->position,
+                    'position' => $staff->supervisor->position?->name,
                 ] : null,
                 'direct_subordinates_count' => $staff->getSpanOfControl(),
                 'total_team_size' => $staff->getTeamSize(),

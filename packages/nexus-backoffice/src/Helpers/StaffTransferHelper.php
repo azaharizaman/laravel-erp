@@ -422,7 +422,7 @@ class StaffTransferHelper
                 return [
                     'id' => $sub->id,
                     'name' => $sub->full_name,
-                    'position' => $sub->position,
+                    'position' => $sub->position?->name,
                 ];
             })->toArray();
         }
