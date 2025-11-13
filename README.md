@@ -1,529 +1,517 @@
-# Laravel ERP System - Monorepo
+# Nexus ERP - Enterprise Laravel ERP Package
 
 ![Status: In Development](https://img.shields.io/badge/status-In%20Development-yellow)
-![PHP](https://img.shields.io/badge/PHP-8.2+-blue)
+![PHP](https://img.shields.io/badge/PHP-8.3+-blue)
 ![Laravel](https://img.shields.io/badge/Laravel-12+-red)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-## 🎥 Project Explainer Video
-
-[![Laravel ERP System Explainer](https://img.youtube.com/vi/X9IVHM1Mpl4/maxresdefault.jpg)](https://youtu.be/X9IVHM1Mpl4)
-
-**Watch the video above** to get a comprehensive overview of the Laravel ERP System architecture, features, and capabilities.
-
----
-
-**Enterprise-grade, headless ERP backend system** built with Laravel 12+ and PHP 8.2+. Designed to rival SAP, Odoo, and Microsoft Dynamics while maintaining superior modularity, extensibility, and agentic capabilities.
-
-This is a **monorepo** containing:
-- 📦 **Modular packages** in `packages/` directory
-- 🚀 **Main application** in `apps/headless-erp-app/` directory
+**Enterprise-grade, headless ERP backend system** built with Laravel 12+ and PHP 8.3+. Designed to rival SAP, Odoo, and Microsoft Dynamics while maintaining superior modularity, extensibility, and agentic capabilities.
 
 ---
 
 ## 🎯 Overview
 
-This is a **headless, API-first ERP system** providing comprehensive business management capabilities through RESTful APIs and CLI commands. No UI components, no views, no frontend assets - just a robust, scalable backend ready to integrate with any frontend or automated system.
+Nexus ERP is a **headless, API-first ERP system** providing comprehensive business management capabilities through RESTful APIs and CLI commands. This is a **composable Laravel package** that can be:
+
+✅ **Required as a package:** `composer require nexus/erp`  
+✅ **Run as a standalone application:** Clone and serve  
+✅ **Integrated into existing Laravel apps:** Extend with your own features
 
 ### Key Characteristics
 
-- 🏗️ **Architecture:** Monorepo with modular packages
-- 🏗️ **Design:** Headless backend-only system (API + CLI)
+- 🏗️ **Architecture:** Package-first design with modular sub-packages
 - 🔌 **Integration:** RESTful APIs (`/api/v1/`) and Artisan commands (`erp:`)
 - 🎨 **Patterns:** Contract-driven, Domain-driven, Event-driven
 - 🤖 **Target Users:** AI agents, custom frontends, automated systems
 - 🧩 **Modularity:** Enable/disable modules without system-wide impact
-- 🔒 **Security:** Zero-trust model for critical operations
+- 🔒 **Security:** Zero-trust model, RBAC, multi-tenancy
+- 📦 **Distribution:** Private Packagist / Satis ready
 
 ---
 
-## � Repository Structure
+## 🚀 Quick Start
+
+### As a Composer Package
+
+```bash
+# Create a new Laravel project
+composer create-project laravel/laravel my-erp-app
+
+# Require nexus/erp
+cd my-erp-app
+composer require nexus/erp
+
+# Publish configuration and migrations
+php artisan vendor:publish --tag=nexus-erp-config
+php artisan vendor:publish --tag=nexus-erp-migrations
+
+# Run migrations
+php artisan migrate
+
+# Start using!
+```
+
+**Use in your app:**
+```php
+use Nexus\Erp\Actions\Auth\LoginAction;
+use Nexus\Erp\Models\User;
+
+$token = LoginAction::run($email, $password, $deviceName, $tenantId);
+```
+
+### As a Standalone Application
+
+```bash
+# Clone the repository
+git clone https://github.com/azaharizaman/nexus-erp.git
+cd nexus-erp
+
+# Install dependencies
+cd apps/headless-erp-app
+composer install
+
+# Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# Setup database and run migrations
+php artisan migrate
+
+# Start the server
+php artisan serve
+```
+
+---
+
+## 📦 Repository Structure
 
 ```
-laravel-erp/
-├── apps/
-│   └── headless-erp-app/        # Main Laravel application
-│       ├── app/
-│       ├── bootstrap/
-│       ├── config/
-│       ├── database/
-│       ├── public/
-│       ├── resources/
-│       ├── routes/
-│       ├── storage/
-│       ├── tests/
-│       └── composer.json
-├── packages/
-│   └── core/                     # Core ERP package
-│       ├── src/                  # Source code (Nexus\Erp\Core namespace)
-│       ├── tests/                # Package tests
-│       ├── composer.json         # Package dependencies
-│       └── README.md             # Package documentation
+nexus-erp/
+├── src/                          # Package source (Nexus\Erp namespace)
+│   ├── Actions/                  # Business operations
+│   ├── Console/Commands/         # CLI commands
+│   ├── Http/
+│   │   ├── Controllers/          # API controllers
+│   │   ├── Middleware/           # Request middleware
+│   │   ├── Requests/             # Form requests
+│   │   └── Resources/            # API resources
+│   ├── Models/                   # Eloquent models
+│   ├── Providers/                # Service providers
+│   ├── Support/
+│   │   ├── Contracts/            # Service contracts
+│   │   ├── Services/             # Service implementations
+│   │   ├── Traits/               # Reusable traits
+│   │   └── Helpers/              # Helper functions
+│   └── ErpServiceProvider.php    # Main service provider
+│
+├── apps/headless-erp-app/        # Optional standalone application
+│   ├── bootstrap/
+│   ├── config/
+│   ├── database/
+│   ├── public/
+│   ├── routes/
+│   └── storage/
+│
+├── packages/                     # Sub-packages (modular)
+│   ├── nexus-tenancy/            # Multi-tenancy (Nexus\Tenancy)
+│   ├── nexus-sequencing/         # Serial numbering (Nexus\Sequencing)
+│   ├── nexus-settings/           # Settings management (Nexus\Settings)
+│   ├── nexus-backoffice/         # Organization structure (Nexus\Backoffice)
+│   ├── nexus-inventory/          # Inventory operations (Nexus\Inventory)
+│   ├── nexus-uom/                # Unit of measure (Nexus\Uom)
+│   ├── nexus-audit-log/          # Audit logging (Nexus\AuditLog)
+│   └── nexus-contracts/          # Shared contracts (Nexus\Contracts)
+│
+├── tests/                        # Test suite
 ├── docs/                         # Documentation
-├── composer.json                 # Monorepo root composer.json
+├── composer.json                 # Package definition
 └── README.md                     # This file
 ```
 
 ---
 
-## �📋 Table of Contents
-
-- [Features](#-features)
-- [Technology Stack](#-technology-stack)
-- [Architecture](#-architecture)
-- [Getting Started](#-getting-started)
-- [Development](#-development)
-- [Documentation](#-documentation)
-- [Testing](#-testing)
-- [Contributing](#-contributing)
-- [License](#-license)
-
----
-
 ## ✨ Features
 
-### Core Infrastructure (packages/core)
-- ✅ **Multi-Tenancy System** - Complete tenant isolation with automatic scoping
-- ✅ **Authentication & Authorization** - Sanctum API tokens + Spatie Permission
-- ✅ **Audit Logging** - Complete activity tracking with Spatie Activitylog
-- ✅ **Serial Numbering** - Configurable document numbering system
-- ✅ **Settings Management** - Tenant-scoped configuration system
+### Core Features
 
-### Backoffice Management
-- ✅ **Company Management** - Multi-company support with laravel-backoffice package
-- ✅ **Office Management** - Office hierarchy with location tracking
-- ✅ **Department Management** - Department structure with cost centers
-- ✅ **Staff Management** - Employee records with organizational hierarchy
+- ✅ **Multi-Tenancy:** Complete tenant isolation with team-scoped permissions
+- ✅ **Authentication:** API token authentication (Laravel Sanctum)
+- ✅ **Authorization:** Role-based access control (RBAC) with Spatie Permission
+- ✅ **Audit Logging:** Complete activity tracking with Spatie Activitylog
+- ✅ **Search:** Full-text search with Laravel Scout
+- ✅ **Settings Management:** Hierarchical settings (global → tenant → user)
+- ✅ **Serial Numbering:** Auto-incrementing sequences for invoices, orders, etc.
 
-### Inventory Management
-- 🚧 **Item Master** - Product/material master data (Planned)
-- 🚧 **Warehouse Management** - Multi-warehouse support (Planned)
-- 🚧 **Stock Management** - Real-time inventory tracking (Planned)
-- 🚧 **UOM Management** - Unit of measure conversions (Planned)
+### Domain Modules
 
-### Sales Management
-- 🚧 **Customer Management** - Customer master data (Planned)
-- 🚧 **Sales Quotation** - Quote generation and tracking (Planned)
-- 🚧 **Sales Order** - Order processing (Planned)
-- 🚧 **Pricing Management** - Dynamic pricing rules (Planned)
-
-### Purchasing Management
-- 🚧 **Vendor Management** - Supplier master data (Planned)
-- 🚧 **Purchase Requisition** - Internal purchase requests (Planned)
-- 🚧 **Purchase Order** - PO creation and tracking (Planned)
-- 🚧 **Goods Receipt** - Receiving and QC (Planned)
-
-### Accounting (Future)
-- 📅 General Ledger
-- 📅 Accounts Payable/Receivable
-- 📅 Financial Reporting
+- 📋 **Backoffice:** Company, Office, Department management
+- 📦 **Inventory:** Items, warehouses, stock movements
+- 📏 **Unit of Measure:** Conversion, compatibility checking
+- 🏗️ **Sales:** (Coming soon) Customers, orders, pricing
+- 🛒 **Purchasing:** (Coming soon) Vendors, POs, receipts
+- 💰 **Accounting:** (Coming soon) GL, AP/AR, reporting
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Core Framework
-- **PHP:** ≥ 8.2 (Using latest features: readonly, enums, union types)
-- **Laravel:** ≥ 12.x (Streamlined directory structure)
-- **Database:** Agnostic (MySQL, PostgreSQL, SQLite, SQL Server)
-
-### Key Packages
-
-#### Business Packages (Internal)
-```json
-{
-  "azaharizaman/laravel-uom-management": "dev-main",
-  "azaharizaman/laravel-inventory-management": "dev-main",
-  "azaharizaman/laravel-backoffice": "dev-main",
-  "azaharizaman/laravel-serial-numbering": "dev-main"
-}
-```
-
-#### Development Tools (Mandatory)
-```json
-{
-  "laravel/scout": "^10.0",          // MANDATORY: Search on all models
-  "laravel/pulse": "^1.0",           // Performance monitoring
-  "pestphp/pest": "^4.0",            // MANDATORY: Testing framework
-  "laravel/pint": "^1.0"             // MANDATORY: Code style
-}
-```
-
-#### Architecture Support
-```json
-{
-  "lorisleiva/laravel-actions": "^2.0",     // Action pattern
-  "spatie/laravel-permission": "^6.0",      // Authorization
-  "spatie/laravel-model-status": "^2.0",    // Status management
-  "spatie/laravel-activitylog": "^4.0",     // Audit logging
-  "brick/math": "^0.12"                      // Decimal precision
-}
-```
+| Component | Version | Purpose |
+|-----------|---------|---------|
+| **PHP** | ≥ 8.3 | Latest PHP features |
+| **Laravel** | ≥ 12.x | Framework |
+| **Database** | Agnostic | MySQL, PostgreSQL, SQLite, SQL Server |
+| **Laravel Scout** | ^10.0 | Search (Meilisearch, Algolia, etc.) |
+| **Laravel Sanctum** | ^4.2 | API authentication |
+| **Spatie Permission** | ^6.0 | RBAC authorization |
+| **Spatie Activitylog** | ^4.0 | Audit logging |
+| **Laravel Actions** | ^2.0 | Action pattern |
+| **Pest** | ^3.8 | Testing framework |
 
 ---
 
-## 🏛️ Architecture
+## 🏗️ Architecture
 
-### Monorepo Structure
+### Design Principles
 
-This project follows a **monorepo architecture** as specified in [PRD01-MVP.md](docs/prd/PRD01-MVP.md):
+1. **Package-First:** Core functionality in `src/` as a distributable package
+2. **Contract-Driven:** All dependencies abstracted behind interfaces
+3. **Domain-Driven:** Clear domain boundaries (Inventory, Sales, Purchasing, etc.)
+4. **Event-Driven:** Cross-domain communication via events
+5. **Repository Pattern:** Data access abstracted from business logic
 
-- **`apps/headless-erp-app/`** - Main Laravel application
-  - Minimal Laravel setup that requires packages from `packages/`
-  - Contains HTTP layer, configuration, and application-specific logic
-  
-- **`packages/core/`** - Core ERP functionality package
-  - Namespace: `Nexus\Erp\Core`
-  - Multi-tenancy, authentication, audit logging
-  - Independent, publishable package
-
-Future packages will be added to `packages/` directory (accounting, inventory, sales, etc.)
-
-### Design Patterns
-
-1. **Contract-Driven Development** - All dependencies abstracted behind interfaces
-2. **Domain-Driven Design** - Strict domain boundaries with clear responsibilities
-3. **Event-Driven Architecture** - Cross-domain communication via events
-4. **Repository Pattern** - Data access abstraction layer
-5. **Action Pattern** - Business operations using Laravel Actions
-6. **Package Decoupling** - External packages wrapped behind contracts
-
-### Package Structure
-
-Each package in `packages/` follows this structure:
-```
-{package-name}/
-├── src/                 # Source code
-│   ├── Actions/         # Business operations
-│   ├── Contracts/       # Interfaces
-│   ├── Events/          # Domain events
-│   ├── Listeners/       # Event handlers
-│   ├── Models/          # Eloquent models
-│   ├── Policies/        # Authorization
-│   ├── Repositories/    # Data access
-│   ├── Services/        # Business logic
-│   └── {Package}ServiceProvider.php
-├── tests/               # Package tests
-├── composer.json        # Package dependencies
-└── README.md            # Package documentation
-```
-
-### Application Structure
+### Namespace Structure
 
 ```
-apps/headless-erp-app/
-├── app/
-│   ├── Console/         # CLI Commands
-│   ├── Http/            # API Controllers, Requests, Resources
-│   ├── Models/          # Application models (User)
-│   ├── Providers/       # Service providers
-│   └── Support/         # Helper utilities & contracts
-│       ├── Contracts/   # Interface definitions
-│       ├── Services/    # Package adapters
-│       └── Traits/      # Reusable model traits
-├── bootstrap/
-├── config/
-├── database/
-│   ├── factories/
-│   ├── migrations/
-│   └── seeders/
-├── public/
-├── resources/
-├── routes/
-├── storage/
-├── tests/
-└── composer.json
+Nexus\Erp\              # Main package namespace
+├── Actions\            # Business operations (Action pattern)
+├── Http\               # HTTP layer (Controllers, Middleware, Requests)
+├── Models\             # Eloquent models
+├── Support\            # Infrastructure (Contracts, Services, Traits)
+└── Providers\          # Service providers
+
+Nexus\Tenancy\          # Sub-package: Multi-tenancy
+Nexus\Inventory\        # Sub-package: Inventory management
+Nexus\Backoffice\       # Sub-package: Organization structure
+...                     # Other sub-packages
 ```
-├── Repositories/     # Data access
-└── Services/         # Business logic
+
+### Service Contracts
+
+All external package dependencies are abstracted:
+
+```php
+// ❌ Never in business code
+use Spatie\Activitylog\Traits\LogsActivity;
+activity()->log('Action performed');
+
+// ✅ Always use contracts
+use Nexus\Erp\Support\Contracts\ActivityLoggerContract;
+
+public function __construct(
+    private readonly ActivityLoggerContract $activityLogger
+) {}
+
+$this->activityLogger->log('Action performed', $model);
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### System Requirements
 
-- PHP ≥ 8.2
-- Composer
-- Database (MySQL 8.0+ / PostgreSQL 13+ / SQLite 3.35+)
-- Node.js & NPM (for asset compilation if needed)
+- PHP >= 8.3
+- Composer >= 2.0
+- MySQL 8.0+ / PostgreSQL 13+ / SQLite 3.35+
+- Redis (optional, for cache/sessions)
+- Meilisearch (optional, for search)
 
-### Installation
+### Installation (as Package)
 
-1. **Clone the repository**
+1. **Require the package:**
    ```bash
-   git clone https://github.com/azaharizaman/laravel-erp.git
-   cd laravel-erp
+   composer require nexus/erp
    ```
 
-2. **Navigate to the main application**
+2. **Publish configuration:**
+   ```bash
+   php artisan vendor:publish --tag=nexus-erp-config
+   ```
+
+3. **Publish migrations:**
+   ```bash
+   php artisan vendor:publish --tag=nexus-erp-migrations
+   ```
+
+4. **Run migrations:**
+   ```bash
+   php artisan migrate
+   ```
+
+5. **Seed database (optional):**
+   ```bash
+   php artisan db:seed --class=Nexus\\Erp\\Database\\Seeders\\ErpSeeder
+   ```
+
+### Installation (Standalone)
+
+1. **Clone repository:**
+   ```bash
+   git clone https://github.com/azaharizaman/nexus-erp.git
+   cd nexus-erp
+   ```
+
+2. **Install dependencies:**
    ```bash
    cd apps/headless-erp-app
-   ```
-
-3. **Install dependencies**
-   ```bash
    composer install
-   npm install
    ```
 
-4. **Environment setup**
+3. **Configure environment:**
    ```bash
    cp .env.example .env
    php artisan key:generate
    ```
 
-5. **Configure database**
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=laravel_erp
-   DB_USERNAME=root
-   DB_PASSWORD=
-   ```
-
-6. **Run migrations**
+4. **Setup database:**
    ```bash
+   # Configure DB_* in .env
    php artisan migrate
-   ```
-
-7. **Seed initial data (optional)**
-   ```bash
    php artisan db:seed
    ```
 
-8. **Start development server**
+5. **Start server:**
    ```bash
    php artisan serve
    ```
 
-The API will be available at `http://localhost:8000/api/v1/`
+---
 
-### Working with Packages
+## 📖 Usage Examples
 
-The core package is symlinked from `packages/core/` to `vendor/azaharizaman/erp-core/` using Composer's path repository feature. Any changes to `packages/core/src/` are immediately reflected in the application.
+### Authentication
+
+```php
+use Nexus\Erp\Actions\Auth\LoginAction;
+use Nexus\Erp\Actions\Auth\RegisterUserAction;
+
+// Login
+$result = LoginAction::run(
+    email: 'user@example.com',
+    password: 'password',
+    deviceName: 'web-browser',
+    tenantId: $tenant->id
+);
+
+$token = $result['token'];
+$user = $result['user'];
+
+// Register
+$user = RegisterUserAction::run([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'password' => 'password',
+    'tenant_id' => $tenant->id,
+]);
+```
+
+### API Requests
+
+```bash
+# Login
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password",
+    "device_name": "web-browser",
+    "tenant_id": "uuid-here"
+  }'
+
+# Use token
+curl -X GET http://localhost:8000/api/v1/tenants \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Multi-Tenancy
+
+```php
+use function tenant;
+
+// Get current tenant (set by middleware)
+$currentTenant = tenant();
+
+// Scoped queries (automatic via BelongsToTenant trait)
+$users = User::all(); // Only returns users for current tenant
+```
+
+### RBAC Authorization
+
+```php
+use Nexus\Erp\Actions\Permission\CreateRoleAction;
+use Nexus\Erp\Actions\Permission\AssignRoleToUserAction;
+
+// Create role
+$role = CreateRoleAction::run(
+    name: 'inventory-manager',
+    permissions: ['view-items', 'create-items', 'adjust-stock'],
+    tenantId: $tenant->id
+);
+
+// Assign role
+AssignRoleToUserAction::run($user, $role);
+
+// Check permissions
+if ($user->can('adjust-stock')) {
+    // Allow stock adjustment
+}
+```
 
 ---
 
-## 💻 Development
+## 🧪 Testing
 
-### Monorepo Workflow
-
-1. **Root-level commands** (from project root):
-   ```bash
-   composer test         # Run all tests
-   composer lint         # Lint all code
-   ```
-
-2. **Application commands** (from `apps/headless-erp-app/`):
-   ```bash
-   composer install      # Install app dependencies
-   php artisan serve     # Start server
-   php artisan test      # Run app tests
-   ```
-
-3. **Package commands** (from `packages/core/`):
-   ```bash
-   composer test         # Run package tests
-   composer lint         # Lint package code
-   ```
-
-### Coding Standards
-
-**🚨 CRITICAL:** Before writing any code, read:
-- [CODING_GUIDELINES.md](CODING_GUIDELINES.md) - Mandatory coding standards
-- [.github/copilot-instructions.md](.github/copilot-instructions.md) - Development patterns
-
-### Key Development Rules
-
-1. **Type Safety:** All files MUST have `declare(strict_types=1);`
-2. **Type Hints:** All methods MUST declare parameter types and return types
-3. **PHPDoc:** All public/protected methods MUST have complete PHPDoc blocks
-4. **Contracts First:** Define interfaces before implementation
-5. **Repository Pattern:** NO direct Model access in services
-6. **Package Decoupling:** Use contracts, not direct package dependencies
-7. **Testing:** Use Pest v4+ syntax (NO PHPUnit classes)
-8. **Multi-Tenancy:** Use `BelongsToTenant` trait on all tenant models
-9. **Search:** Use `IsSearchable` trait on all models (Laravel Scout)
-10. **Audit Logging:** Use `HasActivityLogging` trait for important models
-
-### Code Quality Tools
+### Run Tests
 
 ```bash
-# Format code (MANDATORY before commit)
-./vendor/bin/pint
+# All tests
+composer test
 
-# Run tests
-./vendor/bin/pest
+# Specific suite
+composer test:feature
+composer test:unit
 
-# Run with coverage
-./vendor/bin/pest --coverage
+# With coverage
+composer test:coverage
 
-# Parallel test execution
-./vendor/bin/pest --parallel
+# Parallel execution
+composer test -- --parallel
 ```
 
-### Creating New Features
+### Test Structure
 
-1. **Define Contract** in `app/Domains/{Domain}/Contracts/`
-2. **Create Repository** implementing contract
-3. **Create Action** for business logic
-4. **Create Controller** for API endpoints
-5. **Add Tests** using Pest
-6. **Run Pint** to format code
-
-Example:
-```bash
-# Create new domain action
-php artisan make:action Inventory/CreateItemAction
-
-# Create feature test
-php artisan make:test Inventory/CreateItemTest --pest
-
-# Format and test
-./vendor/bin/pint
-./vendor/bin/pest
+```
+tests/
+├── Feature/              # Feature tests (HTTP, Integration)
+│   ├── Auth/
+│   ├── Tenancy/
+│   └── Support/
+└── Unit/                 # Unit tests
+    ├── Actions/
+    ├── Services/
+    └── Repositories/
 ```
 
 ---
 
 ## 📚 Documentation
 
-### Core Documentation
-- **[CODING_GUIDELINES.md](CODING_GUIDELINES.md)** - Comprehensive coding standards
-- **[GitHub Copilot Instructions](.github/copilot-instructions.md)** - AI-assisted development guide
-- **[Package Decoupling Strategy](docs/architecture/PACKAGE-DECOUPLING-STRATEGY.md)** - Architecture patterns
+- **[Architectural Digest](docs/ARCHITECTURAL_DIGEST.md)** - System architecture overview
+- **[Coding Guidelines](CODING_GUIDELINES.md)** - Development standards and patterns
+- **[Package Decoupling](docs/architecture/PACKAGE-DECOUPLING-STRATEGY.md)** - Service abstraction guide
+- **[Phase 8 Complete](PHASE_8_COMPLETE.md)** - Package transformation summary
+- **[Authentication Guide](docs/SANCTUM_AUTHENTICATION.md)** - API authentication setup
 
-### Feature Documentation
-- **[Multi-Tenancy System](docs/middleware-tenant-resolution.md)** - Tenant isolation guide
-- **[Sanctum Authentication](docs/SANCTUM_AUTHENTICATION.md)** - API authentication
+### API Documentation
 
-### Implementation Plans
-All PRDs are located in `plan/` directory:
-- `PRD-01` through `PRD-05`: Infrastructure (Multi-tenancy, Auth, Audit, Serial, Settings)
-- `PRD-06` through `PRD-09`: Backoffice (Company, Office, Department, Staff)
-- `PRD-10` through `PRD-13`: Inventory (Items, Warehouse, Stock, UOM)
-- `PRD-14` through `PRD-17`: Sales (Customers, Quotation, Orders, Pricing)
-- `PRD-18` through `PRD-21`: Purchasing (Vendors, Requisition, PO, Receipt)
+API documentation is automatically generated and available at:
+- Swagger UI: `/api/documentation`
+- OpenAPI Spec: `/api/documentation.json`
 
 ---
 
-## 🧪 Testing
+## 🔧 Development
 
-### Test Structure
-```
-tests/
-├── Unit/           # Unit tests (isolated, no database)
-├── Feature/        # Feature tests (with database)
-└── Pest.php        # Pest configuration
-```
-
-### Running Tests
+### Code Style
 
 ```bash
-# All tests
-./vendor/bin/pest
+# Fix code style (Laravel Pint)
+./vendor/bin/pint
 
-# Specific test file
-./vendor/bin/pest tests/Feature/Auth/LoginTest.php
-
-# Specific test
-./vendor/bin/pest --filter="can create tenant"
-
-# With coverage
-./vendor/bin/pest --coverage --min=80
-
-# Parallel execution
-./vendor/bin/pest --parallel
+# Check only (CI)
+./vendor/bin/pint --test
 ```
 
-### Test Requirements
+### Available Scripts
 
-- ✅ ALL tests MUST use Pest v4+ syntax (NO PHPUnit classes)
-- ✅ Feature tests MUST use `RefreshDatabase` trait
-- ✅ Unit tests MUST NOT touch the database
-- ✅ Use factories for test data creation
-- ✅ Test API endpoints for authentication and authorization
-- ✅ Test cross-tenant access prevention
+```bash
+# Root monorepo scripts
+composer lint              # Format all code
+composer test              # Run all tests
+
+# App-specific scripts
+composer lint:app          # Format app code
+composer test:app          # Run app tests
+```
+
+### Pre-Commit Checklist
+
+Before committing:
+
+- [ ] Run `./vendor/bin/pint` to fix code style
+- [ ] Run `./vendor/bin/pest` to verify tests pass
+- [ ] All methods have return type declarations
+- [ ] All public/protected methods have PHPDoc blocks
+- [ ] Using repository pattern (no direct Model access in services)
+- [ ] Authentication and authorization checks in place
+- [ ] Complete validation rules for all fillable fields
+
+---
+
+## 📝 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these guidelines:
-
-1. **Read Documentation First**
-   - [CODING_GUIDELINES.md](CODING_GUIDELINES.md)
-   - [.github/copilot-instructions.md](.github/copilot-instructions.md)
-
-2. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-3. **Follow Coding Standards**
-   - Use `declare(strict_types=1);`
-   - Add type hints to all methods
-   - Write complete PHPDoc blocks
-   - Use repository pattern
-   - Write Pest tests
-
-4. **Run Quality Checks**
-   ```bash
-   ./vendor/bin/pint
-   ./vendor/bin/pest
-   ```
-
-5. **Commit with Conventional Commits**
-   ```bash
-   git commit -m "feat: add customer management API"
-   git commit -m "fix: resolve tenant isolation bug"
-   git commit -m "docs: update README with new features"
-   ```
-
-6. **Create Pull Request**
-   - Provide clear description
-   - Reference related issues
-   - Ensure all tests pass
-   - Request review from maintainers
-
-### Commit Message Format
-
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `refactor:` - Code refactoring
-- `test:` - Test additions or changes
-- `chore:` - Maintenance tasks
-
----
-
-## 📄 License
-
-This project is open-sourced software licensed under the [MIT license](LICENSE).
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
 ## 🙏 Acknowledgments
 
-Built with:
-- [Laravel](https://laravel.com) - PHP Framework
-- [Spatie Packages](https://spatie.be/open-source) - Laravel ecosystem tools
-- [Laravel Actions](https://laravelactions.com) - Action pattern implementation
-- [Pest PHP](https://pestphp.com) - Testing framework
+- **Laravel** - The PHP framework for web artisans
+- **Spatie** - Excellent Laravel packages (Permission, Activitylog, etc.)
+- **Lorisleiva Laravel Actions** - Action pattern implementation
+- **Community** - All contributors and users
 
 ---
 
 ## 📞 Support
 
-- **Documentation:** Check `docs/` directory and PRD files in `plan/`
-- **Issues:** [GitHub Issues](https://github.com/azaharizaman/laravel-erp/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/azaharizaman/laravel-erp/discussions)
+- **Documentation:** [docs/](docs/)
+- **Issues:** [GitHub Issues](https://github.com/azaharizaman/nexus-erp/issues)
+- **Email:** azahari@nexusenvision.com
 
 ---
 
-**Version:** 1.0.0-dev  
-**Last Updated:** November 10, 2025  
-**Status:** Active Development
+## 🗺️ Roadmap
+
+### ✅ Completed (Phase 0-8)
+- Multi-tenancy with team-scoped permissions
+- Authentication (Sanctum) and Authorization (RBAC)
+- Audit logging
+- Settings management
+- Serial numbering
+- Unit of measure management
+- **Package transformation (Phase 8)**
+
+### 🚧 In Progress
+- Testing and verification
+- Performance optimization
+
+### 📋 Planned
+- Sales module (customers, orders, pricing)
+- Purchasing module (vendors, POs, receipts)
+- Accounting module (GL, AP/AR, reporting)
+- Advanced inventory features (lot tracking, expiry)
+- Reporting and analytics
+- API versioning enhancements
+
+---
+
+**Status:** Ready for testing and deployment  
+**Version:** 2.0.0 (Package release)  
+**Last Updated:** November 13, 2025
