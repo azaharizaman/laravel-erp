@@ -451,8 +451,8 @@ class StaffTransfer extends Model
             $updates['supervisor_id'] = $this->to_supervisor_id;
         }
         
-        if ($this->to_position !== null) {
-            $updates['position'] = $this->to_position;
+        if ($this->to_position_id !== null) {
+            $updates['position_id'] = $this->to_position_id;
         }
         
         $this->staff->update($updates);
@@ -483,7 +483,7 @@ class StaffTransfer extends Model
         }
         
         if ($this->effective_date->lt(Carbon::today())) {
-            throw new InvalidTransferException('Effective date cannot be today or in the past');
+            throw new InvalidTransferException('Effective date cannot be in the past');
         }
         
         // Validate supervisor change doesn't create circular reference

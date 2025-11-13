@@ -76,8 +76,8 @@ The `backoffice_staff_transfers` table includes:
 ### Basic Transfer Request
 
 ```php
-use AzahariZaman\BackOffice\Models\{Staff, Office, StaffTransfer};
-use AzahariZaman\BackOffice\Enums\StaffTransferStatus;
+use Nexus\BackofficeManagement\Models\{Staff, Office, StaffTransfer};
+use Nexus\BackofficeManagement\Enums\StaffTransferStatus;
 
 // Create a transfer request
 $transfer = StaffTransfer::create([

@@ -192,9 +192,16 @@ class ProcessStaffTransfersCommand extends Command
             ->where(function ($query) {
                 $query->whereHas('department', function ($q) {
                     $q->where('code', 'HR');
-                })->orWhere('position', 'like', '%HR%')
-                  ->orWhere('position', 'like', '%admin%')
-                  ->orWhere('position', 'like', '%system%');
+                })
+                ->orWhereHas('position', function ($q) {
+                    $q->where('name', 'like', '%HR%');
+                })
+                ->orWhereHas('position', function ($q) {
+                    $q->where('name', 'like', '%admin%');
+                })
+                ->orWhereHas('position', function ($q) {
+                    $q->where('name', 'like', '%system%');
+                });
             })
             ->first();
     }
