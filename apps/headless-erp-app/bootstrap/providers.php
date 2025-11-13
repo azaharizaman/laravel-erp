@@ -7,6 +7,5 @@ return [
     App\Providers\LoggingServiceProvider::class,
     App\Providers\PermissionServiceProvider::class,
     App\Providers\SearchServiceProvider::class,
-    Nexus\Core\CoreServiceProvider::class,
-    Nexus\TenancyManagement\TenancyManagementServiceProvider::class,
+    Nexus\Tenancy\TenancyServiceProvider::class,
 ];

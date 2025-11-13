@@ -24,10 +24,8 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test:core": "cd packages/core && composer test",
         "test:app": "cd apps/headless-erp-app && composer test",
         "lint": "pint",
-        "lint:core": "cd packages/core && composer lint",
         "lint:app": "cd apps/headless-erp-app && composer lint"
     },
     "config": {

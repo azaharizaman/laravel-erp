@@ -15,7 +15,6 @@
         "nexus/audit-log": "dev-main",
         "nexus/backoffice": "dev-main",
         "nexus/contracts": "dev-main",
-        "nexus/core": "dev-main",
         "nexus/inventory": "dev-main",
         "nexus/sequencing": "dev-main",
         "nexus/settings": "dev-main",
