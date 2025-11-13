@@ -143,7 +143,7 @@ nexus-erp/
 
 | Current Package | Action | Target Package | Rationale |
 |----------------|--------|----------------|-----------|
-| `azaharizaman/erp-core` | **SPLIT** | `nexus-tenancy-management` + `nexus-identity-management` | Core contains multiple domains (tenancy + auth). Must be atomic. |
+| `azaharizaman/erp-core` | **KEEP** | `apps/headless-erp-app` (orchestrator) | **Orchestration layer - NOT subject to atomicity rules**. Coordinates multiple packages. |
 | `packages/audit-logging` | **RENAME** | `nexus-audit-log` | Align with architecture naming (no "ing" suffix) |
 | `packages/serial-numbering` | **RENAME** | `nexus-sequencing-management` | Architecture doc specifies "sequencing-management" |
 | `packages/settings-management` | **RENAME** | `nexus-settings-management` | Already compliant, just prefix change |
@@ -157,9 +157,13 @@ nexus-erp/
 | Package Name | Purpose | Priority |
 |--------------|---------|----------|
 | `nexus-contracts` | Decoupling layer for all inter-package communication | **HIGH** - Required before refactoring |
+| `nexus-tenancy-management` | Extract multi-tenancy logic from erp-core into atomic package | **HIGH** - Core domain functionality |
+| `nexus-identity-management` | Extract auth/RBAC logic from erp-core into atomic package | **HIGH** - Core domain functionality |
 | `nexus-feature-toggling-management` | Feature flag management | **MEDIUM** - Architecture doc specifies |
 | `nexus-party-management` | Customer/Vendor/Contact management | **LOW** - Future implementation |
 | `nexus-item-master` | Product/Service master data | **LOW** - Future implementation |
+
+**Note:** The `azaharizaman/erp-core` package contains orchestration logic that coordinates multiple atomic packages. While the orchestrator itself doesn't need to follow atomicity rules, it currently also contains some single-domain logic (tenancy and identity) that **should** be extracted into atomic packages to maintain clean separation.
 
 ---
 
@@ -510,21 +514,35 @@ find . -name "*.php" -exec sed -i 's/namespace .*SerialNumbering/namespace Nexus
 find . -name "*.php" -exec sed -i 's/use .*SerialNumbering/use Nexus\\SequencingManagement/g' {} \;
 ```
 
-### **Step 3.4: Split Core Package into Tenancy and Identity**
+### **Step 3.4: Extract Atomic Domains from Core Package**
 
-This is the most complex operation.
+The `azaharizaman/erp-core` package is the **orchestration layer** and is **NOT subject to atomicity rules**. However, it currently contains some single-domain logic that should be extracted into atomic packages for better separation of concerns.
+
+**Important Principle:** The orchestrator (`erp-core`) should only contain:
+- Cross-package coordination logic
+- Service container bindings
+- Event listener registration
+- API route definitions
+- Global middleware
+
+**What to Extract:** Single-domain logic that can function independently.
 
 **Analyze Core Package Structure:**
 
 ```bash
 cd packages/core/src
 
-# List all files by domain
+# Identify tenancy-specific logic (candidate for extraction)
 find . -name "*.php" | xargs grep -l "Tenant\|Multi.*Tenant\|Scoped" > /tmp/tenancy-files.txt
+
+# Identify auth-specific logic (candidate for extraction)
 find . -name "*.php" | xargs grep -l "Auth\|User\|Role\|Permission" > /tmp/identity-files.txt
+
+# Identify orchestration logic (KEEP in core)
+find . -name "*.php" | xargs grep -l "Event\|Listener\|Job\|Queue" > /tmp/orchestration-files.txt
 ```
 
-**Create New Package Structures:**
+**Create New Atomic Package Structures:**
 
 ```bash
 cd packages
@@ -533,22 +551,20 @@ mkdir -p nexus-tenancy-management/{src,database/migrations,tests,config}
 mkdir -p nexus-identity-management/{src,database/migrations,tests,config}
 ```
 
-**Move Tenancy-Related Files:**
+**Extract Tenancy Logic (Optional - Only if Clean Separation Desired):**
 
 ```bash
-# Move Tenant model and related
-cp core/src/Models/Tenant.php nexus-tenancy-management/src/Models/
-cp core/src/Traits/BelongsToTenant.php nexus-tenancy-management/src/Traits/
-cp core/src/Scopes/TenantScope.php nexus-tenancy-management/src/Scopes/
-cp core/src/Middleware/IdentifyTenant.php nexus-tenancy-management/src/Middleware/
+# Move Tenant model and related files (if they exist as standalone domain)
+cp core/src/Models/Tenant.php nexus-tenancy-management/src/Models/ 2>/dev/null || true
+cp core/src/Traits/BelongsToTenant.php nexus-tenancy-management/src/Traits/ 2>/dev/null || true
+cp core/src/Scopes/TenantScope.php nexus-tenancy-management/src/Scopes/ 2>/dev/null || true
 
-# Move tenancy services
-cp core/src/Services/TenantManager.php nexus-tenancy-management/src/Services/
-cp core/src/Repositories/TenantRepository.php nexus-tenancy-management/src/Repositories/
-cp core/src/Contracts/TenantRepositoryContract.php nexus-tenancy-management/src/Contracts/
+# Move tenancy services (if they don't orchestrate other packages)
+cp core/src/Services/TenantManager.php nexus-tenancy-management/src/Services/ 2>/dev/null || true
+cp core/src/Repositories/TenantRepository.php nexus-tenancy-management/src/Repositories/ 2>/dev/null || true
 
 # Move migrations
-cp core/database/migrations/*create_tenants_table.php nexus-tenancy-management/database/migrations/
+cp core/database/migrations/*create_tenants_table.php nexus-tenancy-management/database/migrations/ 2>/dev/null || true
 ```
 
 **Update Tenancy Namespaces:**
@@ -559,21 +575,20 @@ find . -name "*.php" -exec sed -i 's/namespace Nexus\\Erp\\Core/namespace Nexus\
 find . -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\TenancyManagement/g' {} \;
 ```
 
-**Move Identity-Related Files:**
+**Extract Identity Logic (Optional - Only if Clean Separation Desired):**
 
 ```bash
-# Move User model and auth
-cp core/src/Models/User.php nexus-identity-management/src/Models/
-cp core/src/Policies/*.php nexus-identity-management/src/Policies/
-cp core/src/Services/*Auth*.php nexus-identity-management/src/Services/
+# Move User model and auth (if they don't orchestrate other packages)
+cp core/src/Models/User.php nexus-identity-management/src/Models/ 2>/dev/null || true
+cp core/src/Policies/*.php nexus-identity-management/src/Policies/ 2>/dev/null || true
 
 # Move RBAC related (if using Spatie Permission wrapper)
 cp -r core/src/Traits/HasPermissions.php nexus-identity-management/src/Traits/ 2>/dev/null || true
 
 # Move migrations
-cp core/database/migrations/*users*.php nexus-identity-management/database/migrations/
-cp core/database/migrations/*permissions*.php nexus-identity-management/database/migrations/
-cp core/database/migrations/*roles*.php nexus-identity-management/database/migrations/
+cp core/database/migrations/*users*.php nexus-identity-management/database/migrations/ 2>/dev/null || true
+cp core/database/migrations/*permissions*.php nexus-identity-management/database/migrations/ 2>/dev/null || true
+cp core/database/migrations/*roles*.php nexus-identity-management/database/migrations/ 2>/dev/null || true
 ```
 
 **Update Identity Namespaces:**
@@ -584,7 +599,7 @@ find . -name "*.php" -exec sed -i 's/namespace Nexus\\Erp\\Core/namespace Nexus\
 find . -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\IdentityManagement/g' {} \;
 ```
 
-**Create composer.json for both:**
+**Create composer.json for Extracted Packages:**
 
 `packages/nexus-tenancy-management/composer.json`:
 
@@ -643,11 +658,30 @@ find . -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\IdentityMan
 }
 ```
 
-**Archive Old Core Package:**
+**Keep Core Package for Orchestration:**
 
 ```bash
-# Move to archive after successful split
-mv packages/core packages/_archived_core
+# DO NOT delete packages/core or azaharizaman/erp-core
+# It remains as the orchestration layer with:
+# - Service provider bindings
+# - Event listeners that coordinate packages
+# - Cross-package actions
+# - API presentation logic
+```
+
+**Update Core Package Dependencies:**
+
+After extraction, update `packages/core/composer.json` to depend on the new atomic packages:
+
+```json
+{
+    "name": "azaharizaman/erp-core",
+    "require": {
+        "nexus/tenancy-management": "dev-main",
+        "nexus/identity-management": "dev-main",
+        "nexus/contracts": "dev-main"
+    }
+}
 ```
 
 ---
