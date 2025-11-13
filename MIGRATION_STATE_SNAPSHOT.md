@@ -140,8 +140,28 @@ composer install
   - Added composer.json with PSR-4 autoloading
   - Created service provider for auto-discovery
   - Ready for Phase 2 (package renaming)
-- [ ] **Checkpoint 2:** Existing packages renamed
-- [ ] **Checkpoint 3:** External packages internalized
+- [x] **Checkpoint 2:** Existing packages renamed ✅ **DONE** (Nov 13, 2025)
+  - Renamed audit-logging → nexus-audit-log (Nexus\AuditLog)
+  - Renamed serial-numbering → nexus-sequencing-management (Nexus\SequencingManagement)
+  - Renamed settings-management → nexus-settings-management (Nexus\SettingsManagement)
+  - Updated core package → nexus/core (Nexus\Core)
+  - Updated all namespaces from Nexus\Erp\* to Nexus\{PackageName}\*
+  - Added nexus/contracts dependency to all packages
+  - Ready for Phase 3 (internalize external packages)
+- [x] **Checkpoint 3:** External packages internalized ✅ **DONE** (Nov 13, 2025)
+  - Internalized nexus-uom-management from azaharizaman/laravel-uom-management
+    - Updated composer.json: nexus/uom-management, Nexus\UomManagement namespace
+    - Added nexus/contracts dependency
+    - Bulk replaced all namespaces in PHP files
+  - Internalized nexus-inventory-management from azaharizaman/laravel-inventory-management
+    - Updated composer.json: nexus/inventory-management, Nexus\InventoryManagement namespace
+    - Dependencies: nexus/contracts, nexus/uom-management, nexus/backoffice-management
+    - Bulk replaced all namespaces in PHP files
+  - Internalized nexus-backoffice-management from azaharizaman/laravel-backoffice
+    - Updated composer.json: nexus/backoffice-management, Nexus\BackofficeManagement namespace
+    - Added nexus/contracts dependency
+    - Bulk replaced all namespaces (AzahariZaman\BackOffice → Nexus\BackofficeManagement)
+  - Ready for Phase 4 (create new atomic packages)
 - [ ] **Checkpoint 4:** New atomic packages created
 - [ ] **Checkpoint 5:** Main application updated
 - [ ] **Checkpoint 6:** Tests passing

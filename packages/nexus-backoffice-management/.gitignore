@@ -1,0 +1,196 @@
+# Laravel Package .gitignore
+
+# Composer dependencies
+/vendor/
+composer.phar
+composer.lock
+
+# PHPUnit and testing
+/.phpunit.result.cache
+/build/
+/coverage/
+/phpunit.xml.dist
+
+# PHP Storm / JetBrains IDEs
+/.idea/
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+/.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+*.swp
+*.swo
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# PHP-specific
+*.log
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+
+# Package-specific files
+/storage/
+/bootstrap/cache/
+/config/app.php
+/public/storage
+/public/hot
+/public/mix-manifest.json
+*.key
+*.pem
+
+# Node.js (in case of frontend assets)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Cache directories
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# Editor backups and swap files
+*~
+*.bak
+*.tmp
+*.temp
+
+# Archive files (usually shouldn't be in repos)
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Documentation build
+/docs/build/
+/docs/_build/
+/.doctrees/
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
+# Package management lock files (keep composer.lock for packages)
+# Uncomment the next line if you want to ignore composer.lock
+# composer.lock
+
+# Runtime configuration
+.phpunit.result.cache
+/.phpunit.cache
+
+# Code coverage output
+/coverage.xml
+/clover.xml
+/cov.xml
+
+# Deployment
+.deploy/
+.deployment
+
+# Local development
+.vagrant/
+Vagrantfile.local
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Local configuration
+.env.local
+local.php
+coverage-report
+coverage.xml
