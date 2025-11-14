@@ -14,12 +14,8 @@ declare(strict_types=1);
 */
 
 uses(
-    Orchestra\Testbench\TestCase::class,
-    Illuminate\Foundation\Testing\RefreshDatabase::class,
-)->beforeEach(function () {
-    // Load migrations before each test
-    $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-})->in('Feature');
+    Tests\TestCase::class,
+)->in('Feature');
 
 uses(
     PHPUnit\Framework\TestCase::class,
