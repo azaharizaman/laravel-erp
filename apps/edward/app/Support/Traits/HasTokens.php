@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Support\Traits;
+namespace Edward\Support\Traits;
 
 use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;

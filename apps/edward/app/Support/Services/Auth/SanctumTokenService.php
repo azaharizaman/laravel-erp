@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Support\Services\Auth;
+namespace Edward\Support\Services\Auth;
 
 use Nexus\Erp\Models\User;
 use Nexus\Erp\Support\Contracts\TokenServiceContract;

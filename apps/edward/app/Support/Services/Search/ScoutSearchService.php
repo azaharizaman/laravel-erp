@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Support\Services\Search;
+namespace Edward\Support\Services\Search;
 
 use Nexus\Erp\Support\Contracts\SearchServiceContract;
 use Illuminate\Database\Eloquent\Collection;

@@ -187,10 +187,11 @@ class EdwardMenuCommand extends Command
                 '1' => '🏢 Tenant Management',
                 '2' => '👤 User Management',
                 '3' => '📦 Inventory Management',
-                '4' => '⚙️  Settings & Configuration',
-                '5' => '📊 Reports & Analytics',
-                '6' => '🔍 Search & Query',
-                '7' => '📝 Audit Logs',
+                '4' => '🔄 Workflow & Tasks (Phase 2)',
+                '5' => '⚙️  Settings & Configuration',
+                '6' => '📊 Reports & Analytics',
+                '7' => '🔍 Search & Query',
+                '8' => '📝 Audit Logs',
                 '0' => '🚪 Exit Edward',
             ],
             default: '1',
@@ -210,10 +211,11 @@ class EdwardMenuCommand extends Command
             '1' => $this->tenantManagement(),
             '2' => $this->userManagement(),
             '3' => $this->inventoryManagement(),
-            '4' => $this->settingsConfiguration(),
-            '5' => $this->reportsAnalytics(),
-            '6' => $this->searchQuery(),
-            '7' => $this->auditLogs(),
+            '4' => $this->workflowManagement(),
+            '5' => $this->settingsConfiguration(),
+            '6' => $this->reportsAnalytics(),
+            '7' => $this->searchQuery(),
+            '8' => $this->auditLogs(),
             default => error('Invalid choice'),
         };
         
@@ -986,6 +988,17 @@ class EdwardMenuCommand extends Command
         info('🔬 Advanced Search');
         $this->comment('📌 Coming soon: Advanced audit log search');
         $this->newLine();
+    }
+    
+    /**
+     * Workflow Management (Phase 2)
+     *
+     * @return void
+     */
+    protected function workflowManagement(): void
+    {
+        // Call the WorkflowManagementCommand with current user
+        $this->call('edward:workflow', ['user' => $this->currentUser->id]);
     }
     
     /**

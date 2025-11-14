@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Models;
+namespace Edward\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Nexus\Erp\Support\Traits\HasActivityLogging;

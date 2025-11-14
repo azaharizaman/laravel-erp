@@ -2,7 +2,7 @@
 
 **Date:** November 12, 2025  
 **Status:** ✅ Core Implementation Complete  
-**Package:** `azaharizaman/erp-serial-numbering`
+**Package:** `nexus-sequencing`
 
 ## Implementation Overview
 

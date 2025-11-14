@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Support\Contracts;
+namespace Edward\Support\Contracts;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;

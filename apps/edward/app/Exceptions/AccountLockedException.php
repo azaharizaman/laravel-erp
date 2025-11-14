@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Exceptions;
+namespace Edward\Exceptions;
 
 use Exception;
 

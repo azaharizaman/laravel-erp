@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Actions\Permission;
+namespace Edward\Actions\Permission;
 
 use Nexus\Erp\Events\Permission\RoleAssignedEvent;
 use Nexus\Erp\Models\User;

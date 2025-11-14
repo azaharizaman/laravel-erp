@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "451fc294639ab18d50ceed3346561ec8",
+    "content-hash": "e2cdcfaaed08375cfcae41c0f630d769",
     "packages": [
         {
             "name": "brick/math",
@@ -3196,6 +3196,64 @@
                 }
             ],
             "description": "Sophisticated UOM Management for Laravel",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "nexus/workflow",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/nexus-workflow",
+                "reference": "98c14ffb0af24d25d3fcec54bd8d982a95f6caff"
+            },
+            "require": {
+                "illuminate/database": "^12.0",
+                "illuminate/support": "^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "pestphp/pest": "^3.0",
+                "phpstan/phpstan": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Nexus\\Workflow\\WorkflowServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Nexus\\Workflow\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Nexus\\Workflow\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nexus ERP Team",
+                    "email": "dev@nexus-erp.com"
+                }
+            ],
+            "description": "Progressive workflow and state machine engine for PHP/Laravel - from 5-minute blog post state machines to enterprise-grade ERP approval automation",
+            "keywords": [
+                "approval",
+                "bpm",
+                "laravel",
+                "nexus-erp",
+                "state-machine",
+                "workflow"
+            ],
             "transport-options": {
                 "relative": true
             }
@@ -9899,7 +9957,8 @@
         "nexus/sequencing": 20,
         "nexus/settings": 20,
         "nexus/tenancy": 20,
-        "nexus/uom": 20
+        "nexus/uom": 20,
+        "nexus/workflow": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

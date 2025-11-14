@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Support\Services\Logging;
+namespace Edward\Support\Services\Logging;
 
 use Nexus\Erp\Support\Contracts\ActivityLoggerContract;
 use Carbon\Carbon;

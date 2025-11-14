@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Providers;
+namespace Edward\Providers;
 
 use Nexus\Erp\Support\Contracts\SearchServiceContract;
 use Nexus\Erp\Support\Services\Search\ScoutSearchService;
