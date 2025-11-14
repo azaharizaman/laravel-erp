@@ -42,20 +42,20 @@ final class WorkflowServiceProvider extends ServiceProvider
             
             if ($engine === 'database') {
                 return new DatabaseWorkflowEngine(
-                    $app->make(\Nexus\Workflow\Services\StateTransitionService::class)
+                    $app->make(\Nexus\Workflow\Core\Services\StateTransitionService::class)
                 );
             }
             
             // Default to database engine
             return new DatabaseWorkflowEngine(
-                $app->make(\Nexus\Workflow\Services\StateTransitionService::class)
+                $app->make(\Nexus\Workflow\Core\Services\StateTransitionService::class)
             );
         });
 
         // Register singleton for DatabaseWorkflowEngine
         $this->app->singleton(DatabaseWorkflowEngine::class, function ($app) {
             return new DatabaseWorkflowEngine(
-                $app->make(\Nexus\Workflow\Services\StateTransitionService::class)
+                $app->make(\Nexus\Workflow\Core\Services\StateTransitionService::class)
             );
         });
     }
