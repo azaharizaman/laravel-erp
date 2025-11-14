@@ -79,4 +79,4 @@ abstract class TestCase extends BaseTestCase
         $app['config']->set('audit-logging.notify_high_value_events', false);
     }
 }
-}
+
