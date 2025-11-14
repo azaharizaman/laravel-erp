@@ -41,6 +41,42 @@ This document serves as the guide for all new feature development and the ongoin
 
 **The Atomic Rule:** All business logic that governs a single, independent domain of the ERP (e.g., UOMs, Serial Numbers, Currencies) MUST reside in its own package. The Nexus ERP Core is responsible only for **Orchestration, Configuration, and API Presentation**.
 
+### **Atomicity Definition in Nexus ERP Context**
+
+**Important:** In the context of Nexus ERP, "atomicity" refers to **architectural atomicity** - the principle that each package represents an indivisible, complete business domain that cannot be meaningfully subdivided while maintaining functional coherence.
+
+**This is NOT to be confused with:**
+- **ACID Atomicity:** Database transaction all-or-nothing properties
+- **Concurrent Atomicity:** Thread-safe, indivisible operations in multithreading
+- **Lock-free Atomicity:** Hardware-level atomic read-modify-write operations
+
+**Our "Atomic Packages" embody:**
+1. **Single Domain Completeness:** Each package contains ALL logic for one business domain
+2. **Independent Testability:** Can be tested in complete isolation as if used in a different Laravel application
+3. **Zero Cross-Package Coupling:** No direct dependencies between atomic packages
+4. **Self-Contained Functionality:** Models, repositories, contracts, events, and domain-specific business rules
+5. **Reusable Components:** Can function independently outside the Nexus ERP ecosystem
+
+### **The Testability Criterion (Critical)**
+
+**Every atomic package MUST be testable in complete isolation.** If any class or method within a package cannot be tested independently (as if the package were used in a different Laravel application), this indicates a violation of atomicity principles:
+
+**Diagnosis and Resolution:**
+1. **Package Misplacement:** The package belongs in `Nexus\Erp` orchestration layer, not as an atomic package
+2. **Method/Class Misplacement:** The specific class/method belongs in the orchestration layer (`Nexus\Erp`)
+3. **Missing Dependencies:** The package needs to declare legitimate dependencies via `composer.json` (which preserves atomicity while providing necessary support packages)
+
+**Valid Dependencies for Atomic Packages:**
+- Laravel Framework components
+- Utility libraries (Carbon, Str, etc.)
+- Domain-specific packages (e.g., money/money for financial calculations)
+- Infrastructure packages that don't contain business logic
+
+**Invalid Dependencies:**
+- Other Nexus atomic packages
+- Framework presentation layer components (Controllers, Commands, Jobs)
+- Cross-domain orchestration logic
+
 ## **2\. Defining Architectural Boundaries**
 
 When developing a new feature or refactoring existing code, the first question must be: **"Is this core domain logic, or is this integration/presentation?"**
@@ -55,6 +91,13 @@ Packages are self-contained Laravel applications/services that are **headless** 
 | **Data Persistence** | Handling all CRUD operations for the package's specific models. | UomRepository, SerialTracker model. |
 | **API Endpoints (Internal)** | Packages MUST define their own API routes, but these are for **internal use only** (e.g., for local testing or package-internal calls) and are not the public-facing ERP API. | GET /api/uom-management/uoms |
 | **Isolation** | A package **MUST NOT** be aware of the existence of other atomic packages. | nexus-uom cannot directly call a class from nexus-accounting. |
+| **Independent Testability** | **MANDATORY:** Every class and method must be fully testable in isolation, as if the package were used in a completely different Laravel application. | Complete test suite runnable with `composer test` without any Nexus ERP dependencies. |
+
+**Critical Testability Requirement:**  
+Each atomic package MUST be able to run its complete test suite independently using only its declared `composer.json` dependencies. If any test fails due to missing Nexus ERP context or requires other atomic packages, this indicates an architectural violation that must be resolved by either:
+1. Moving the problematic code to `Nexus\Erp` orchestration layer
+2. Adding legitimate dependencies to the package's `composer.json`
+3. Refactoring to eliminate cross-package coupling
 
 How Packages Communicate:  
 Packages must communicate via Contracts (Interfaces) and Events. If Package A needs to use Package B, Package A defines a PHP Interface (Contract) for the service it needs, and the Nexus ERP Core binds the concrete implementation from Package B to that interface.
@@ -532,11 +575,12 @@ Use this checklist for every new file or feature.
 | \# | Question | Decision Path | Location |
 | :---- | :---- | :---- | :---- |
 | **1\.** | **Is this logic exclusively about a single domain (e.g., only UOMs, only Currencies, only User Permissions)?** | Yes, it is **atomic**. | **The Atomic Package** |
-| **2\.** | **Does this logic need to call, reference, or be aware of a class or model from *another* Nexus atomic package?** | Yes, it requires cross-package knowledge (Coordination). | **Nexus ERP Core (Orchestration Layer)** |
-| **3\.** | **Is this code a public-facing endpoint for a client application to consume (e.g., part of the v1 API)?** | Yes, this is **presentation**. | **Nexus ERP Core (Routes)** |
-| **4\.** | **Is this an Interface/Contract that defines *how* a specific service should be consumed?** | Yes, this promotes decoupling. | **nexus/erp** (Contracts directory) - The orchestration layer manages all inter-package contracts. |
-| **5\.** | **Is this code responsible for registering a package's service provider or setting up global environment variables?** | Yes, this is **bootstrapping**. | **Nexus ERP Core (Service Providers)** |
-| **6\.** | **Is this code can be release as an individual composer package that make sense to be use in othe applications and with meaningful purpose to be use on its own?** | Yes, this is **Purposeful Composer Package**. | **The Atomic Package** |
+| **2\.** | **Can this class/method be fully tested in isolation without any Nexus ERP context or other atomic packages?** | No, it requires external dependencies or orchestration. | **Nexus ERP Core (Orchestration Layer)** |
+| **3\.** | **Does this logic need to call, reference, or be aware of a class or model from *another* Nexus atomic package?** | Yes, it requires cross-package knowledge (Coordination). | **Nexus ERP Core (Orchestration Layer)** |
+| **4\.** | **Is this code a public-facing endpoint for a client application to consume (e.g., part of the v1 API)?** | Yes, this is **presentation**. | **Nexus ERP Core (Routes)** |
+| **5\.** | **Is this an Interface/Contract that defines *how* a specific service should be consumed?** | Yes, this promotes decoupling. | **nexus/erp** (Contracts directory) - The orchestration layer manages all inter-package contracts. |
+| **6\.** | **Is this code responsible for registering a package's service provider or setting up global environment variables?** | Yes, this is **bootstrapping**. | **Nexus ERP Core (Service Providers)** |
+| **7\.** | **Is this code can be release as an individual composer package that make sense to be use in othe applications and with meaningful purpose to be use on its own?** | Yes, this is **Purposeful Composer Package**. | **The Atomic Package** |
 
 ### **Example Scenarios:**
 
@@ -544,7 +588,9 @@ Use this checklist for every new file or feature.
 | :---- | :---- | :---- |
 | **Calculating volume conversion (Liters to Gallons).** | nexus-uom | Pure, atomic domain logic. |
 | **Defining the structure of the PurchaseOrder model.** | nexus-accounting | Atomic domain logic for the accounting module. |
+| **A service class that can be tested with only `vendor/autoload.php` and mock database.** | nexus-uom | Passes the independent testability criterion. |
 | **The API endpoint POST /api/v1/po/create which takes a PurchaseOrder request, validates the UOMs using the UOM service, and requests a serial number for the PO from the Serialization service.** | **nexus/erp** (Core) | This orchestrates two different packages (accounting and sequencing). |
+| **A method that requires calling both nexus-tenancy and nexus-backoffice services to function.** | **nexus/erp** (Core) | Fails the independent testability criterion - requires orchestration. |
 | **The logic for checking if a serial number has been voided.** | nexus-sequencing | Pure, atomic domain logic. |
 
 ## **9\. Technical Refactoring Directives**
