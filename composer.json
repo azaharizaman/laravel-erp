@@ -21,6 +21,7 @@
         "nexus/settings": "dev-main",
         "nexus/tenancy": "dev-main",
         "nexus/uom": "dev-main",
+        "nexus/workflow": "dev-main",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {
