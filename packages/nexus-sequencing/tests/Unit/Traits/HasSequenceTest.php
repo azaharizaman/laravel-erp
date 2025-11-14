@@ -76,7 +76,7 @@ class HasSequenceTest extends TestCase
         $invoice->tenant_id = 'tenant-789';
         $invoice->department = 'sales';
         
-        $po->fireModelEvent('creating');
+        $invoice->fireModelEvent('creating');
 
         $this->assertEquals('DEPT-INV-001', $invoice->invoice_number);
     }
@@ -284,7 +284,7 @@ class TestSilentInvoiceModel extends Model
     protected $table = 'invoices';
     public $timestamps = false;
 
-    protected function getSequenceErrorHandling(): string
+    protected function getSequenceFailureMode(): string
     {
         return 'silent';
     }
@@ -297,7 +297,7 @@ class TestStrictInvoiceModel extends Model
     protected $table = 'invoices';
     public $timestamps = false;
 
-    protected function getSequenceErrorHandling(): string
+    protected function getSequenceFailureMode(): string
     {
         return 'strict';
     }
