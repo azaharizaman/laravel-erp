@@ -6,6 +6,9 @@ use Nexus\Erp\Models\Tenant;
 use Nexus\Tenancy\Enums\TenantStatus;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     // Ensure tenants table exists with workflow_state column
