@@ -6,6 +6,7 @@ namespace Nexus\Sequencing\Core\Services;
 
 use Nexus\Sequencing\Core\ValueObjects\PatternTemplate;
 use Nexus\Sequencing\Core\ValueObjects\GenerationContext;
+use Nexus\Sequencing\Core\Contracts\ValidationResult;
 
 /**
  * Validation Service
@@ -369,6 +370,8 @@ class ValidationService
             'DAY' => in_array(strtoupper($parameter), ['ST', 'ND', 'RD', 'TH']),
             'YEAR' => in_array(strtoupper($parameter), ['YY', 'YYYY']),
             'MONTH' => in_array(strtoupper($parameter), ['MM', 'MON', 'MONTH']),
+            'HOUR', 'MINUTE', 'SECOND' => in_array(strtoupper($parameter), ['H', 'HH', 'M', 'MM', 'S', 'SS']),
+            'TIMESTAMP' => in_array(strtoupper($parameter), ['S', 'MS', 'US']),
             default => false,
         };
     }
@@ -392,76 +395,5 @@ class ValidationService
             'WEEK_YEAR' => in_array(strtoupper($parameter), ['YY', 'YYYY']),
             default => false,
         };
-    }
-}
-
-/**
- * Validation Result Value Object
- * 
- * Encapsulates the result of a validation operation with
- * success status, error messages, and warnings.
- */
-readonly class ValidationResult
-{
-    public function __construct(
-        public bool $isValid,
-        public array $errors = [],
-        public array $warnings = []
-    ) {}
-
-    /**
-     * Create a successful validation result.
-     */
-    public static function success(array $warnings = []): self
-    {
-        return new self(true, [], $warnings);
-    }
-
-    /**
-     * Create a failed validation result.
-     */
-    public static function failed(array $errors, array $warnings = []): self
-    {
-        return new self(false, $errors, $warnings);
-    }
-
-    /**
-     * Get error messages.
-     */
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
-
-    /**
-     * Get warning messages.
-     */
-    public function getWarnings(): array
-    {
-        return $this->warnings;
-    }
-
-    /**
-     * Get all messages (errors + warnings).
-     */
-    public function getAllMessages(): array
-    {
-        return array_merge($this->errors, $this->warnings);
-    }
-
-    /**
-     * Check if result has any errors.
-     */
-    public function hasErrors(): bool
-    {
-        return !empty($this->errors);
-    }
-
-    /**
-     * Check if result has any warnings.
-     */
-    public function hasWarnings(): bool
-    {
-        return !empty($this->warnings);
     }
 }
