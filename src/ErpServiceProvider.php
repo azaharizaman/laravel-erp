@@ -67,6 +67,7 @@ class ErpServiceProvider extends ServiceProvider
         // Load Nexus ERP routes
         $this->loadRoutesFrom(__DIR__.'/../routes/audit-log.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/console.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/api-backoffice.php');
 
         // Load routes (if api.php exists in Edward)
         if (file_exists(__DIR__.'/../apps/edward/routes/api.php')) {
