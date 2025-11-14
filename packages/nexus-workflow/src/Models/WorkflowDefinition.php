@@ -164,15 +164,15 @@ class WorkflowDefinition extends Model
         ], $options | JSON_PRETTY_PRINT);
     }
 
-    /**
+        /**
      * Import workflow definition from JSON.
      */
-    public static function fromJson(string $json, ?string $createdBy = null): self
+    public static function importFromJson(string $json, ?string $createdBy = null): self
     {
         $data = json_decode($json, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \InvalidArgumentException('Invalid JSON: ' . json_last_error_msg());
+            throw new \JsonException('Invalid JSON: ' . json_last_error_msg());
         }
 
         return static::create([
@@ -181,7 +181,7 @@ class WorkflowDefinition extends Model
             'description' => $data['description'] ?? null,
             'version' => $data['version'] ?? 1,
             'definition' => $data['definition'],
-            'is_active' => false,
+            'is_active' => $data['is_active'] ?? false,
             'created_by' => $createdBy,
         ]);
     }

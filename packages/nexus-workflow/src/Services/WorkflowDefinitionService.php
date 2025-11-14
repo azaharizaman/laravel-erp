@@ -231,7 +231,7 @@ class WorkflowDefinitionService
     public function importFromJson(string $json, ?string $createdBy = null, bool $activate = false): WorkflowDefinition
     {
         try {
-            $workflow = WorkflowDefinition::fromJson($json, $createdBy);
+            $workflow = WorkflowDefinition::importFromJson($json, $createdBy);
 
             if ($activate) {
                 $workflow->activate();
