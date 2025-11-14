@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Events\Permission;
+namespace Edward\Events\Permission;
 
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;

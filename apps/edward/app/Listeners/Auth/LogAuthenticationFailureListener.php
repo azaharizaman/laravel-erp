@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Listeners\Auth;
+namespace Edward\Listeners\Auth;
 
 use Nexus\Erp\Events\Auth\LoginFailedEvent;
 use Illuminate\Events\Attribute\Listen;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Enums;
+namespace Edward\Enums;
 
 /**
  * Unit of Measure Categories

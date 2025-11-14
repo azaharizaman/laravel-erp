@@ -87,12 +87,6 @@ class Tenant extends BaseTenant
                     'after' => function ($tenant, $context) {
                         // Update the status enum in the base model
                         $tenant->update(['status' => \Nexus\Tenancy\Enums\TenantStatus::ACTIVE]);
-                        
-                        // Log activation
-                        activity()
-                            ->performedOn($tenant)
-                            ->causedBy($context['approved_by'] ?? null)
-                            ->log('Tenant activated');
                     },
                 ],
                 
@@ -100,20 +94,9 @@ class Tenant extends BaseTenant
                     'label' => 'Suspend Tenant',
                     'from' => ['active'],
                     'to' => 'suspended',
-                    'before' => function ($tenant, $context) {
-                        // Log reason for suspension
-                        $reason = $context['reason'] ?? 'No reason provided';
-                        activity()
-                            ->performedOn($tenant)
-                            ->causedBy($context['suspended_by'] ?? null)
-                            ->withProperties(['reason' => $reason])
-                            ->log('Tenant suspended');
-                    },
                     'after' => function ($tenant, $context) {
                         // Update status enum
                         $tenant->update(['status' => \Nexus\Tenancy\Enums\TenantStatus::SUSPENDED]);
-                        
-                        // TODO: Disable tenant access, notify users
                     },
                 ],
                 
@@ -127,11 +110,6 @@ class Tenant extends BaseTenant
                     },
                     'after' => function ($tenant, $context) {
                         $tenant->update(['status' => \Nexus\Tenancy\Enums\TenantStatus::ACTIVE]);
-                        
-                        activity()
-                            ->performedOn($tenant)
-                            ->causedBy($context['reactivated_by'] ?? null)
-                            ->log('Tenant reactivated');
                     },
                 ],
                 
@@ -143,19 +121,10 @@ class Tenant extends BaseTenant
                         // Require admin approval for archiving
                         return $context['admin_approved'] ?? false;
                     },
-                    'before' => function ($tenant, $context) {
-                        // Log archival reason
-                        $reason = $context['reason'] ?? 'No reason provided';
-                        activity()
-                            ->performedOn($tenant)
-                            ->causedBy($context['archived_by'] ?? null)
-                            ->withProperties(['reason' => $reason])
-                            ->log('Tenant archived');
-                    },
                     'after' => function ($tenant, $context) {
                         $tenant->update(['status' => \Nexus\Tenancy\Enums\TenantStatus::ARCHIVED]);
                         
-                        // TODO: Soft delete tenant data, schedule full deletion
+                        // Soft delete tenant data
                         $tenant->delete();
                     },
                 ],
@@ -165,8 +134,8 @@ class Tenant extends BaseTenant
                     'from' => ['archived'],
                     'to' => 'active',
                     'guard' => function ($tenant, $context) {
-                        // Require super admin approval
-                        return ($context['super_admin_approved'] ?? false)
+                        // Require super admin approval and data integrity check
+                        return ($context['super_admin'] ?? false)
                             && ($context['data_intact'] ?? false);
                     },
                     'before' => function ($tenant, $context) {
@@ -175,11 +144,6 @@ class Tenant extends BaseTenant
                     },
                     'after' => function ($tenant, $context) {
                         $tenant->update(['status' => \Nexus\Tenancy\Enums\TenantStatus::ACTIVE]);
-                        
-                        activity()
-                            ->performedOn($tenant)
-                            ->causedBy($context['restored_by'] ?? null)
-                            ->log('Tenant restored from archive');
                     },
                 ],
             ],

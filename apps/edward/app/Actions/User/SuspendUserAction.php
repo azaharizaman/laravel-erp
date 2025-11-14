@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Actions\User;
+namespace Edward\Actions\User;
 
 use Nexus\Erp\Events\Auth\UserSuspendedEvent;
 use Nexus\Erp\Models\User;

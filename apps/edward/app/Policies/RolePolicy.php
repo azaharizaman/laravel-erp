@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Policies;
+namespace Edward\Policies;
 
 use Nexus\Erp\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;

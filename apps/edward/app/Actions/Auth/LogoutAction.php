@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Actions\Auth;
+namespace Edward\Actions\Auth;
 
 use Nexus\Erp\Events\Auth\UserLoggedOutEvent;
 use Nexus\Erp\Models\User;

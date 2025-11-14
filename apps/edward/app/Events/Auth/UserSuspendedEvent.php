@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Events\Auth;
+namespace Edward\Events\Auth;
 
 use Nexus\Erp\Models\User;
 use Illuminate\Foundation\Events\Dispatchable;

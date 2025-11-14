@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Services\UnitOfMeasure;
+namespace Edward\Services\UnitOfMeasure;
 
 use Nexus\Erp\Support\Contracts\UomRepositoryContract;
 use Nexus\Erp\Exceptions\UnitOfMeasure\IncompatibleUomException;

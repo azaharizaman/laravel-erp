@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Actions\UnitOfMeasure;
+namespace Edward\Actions\UnitOfMeasure;
 
 use Nexus\Erp\Exceptions\UnitOfMeasure\InvalidQuantityException;
 use Nexus\Erp\Services\UnitOfMeasure\UomConversionService;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Support\Services\Permission;
+namespace Edward\Support\Services\Permission;
 
 use Nexus\Erp\Support\Contracts\PermissionServiceContract;
 use Illuminate\Database\Eloquent\Model;

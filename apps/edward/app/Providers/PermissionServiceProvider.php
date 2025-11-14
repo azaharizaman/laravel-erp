@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nexus\Erp\Providers;
+namespace Edward\Providers;
 
 use Nexus\Erp\Support\Contracts\PermissionServiceContract;
 use Nexus\Erp\Support\Services\Permission\SpatiePermissionService;

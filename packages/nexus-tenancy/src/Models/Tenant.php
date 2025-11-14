@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Nexus\Tenancy\Models;
 
-use App\Support\Traits\HasActivityLogging;
-use App\Support\Traits\IsSearchable;
 use Nexus\Tenancy\Enums\TenantStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tenant extends Model
 {
-    use HasActivityLogging, HasFactory, HasUuids, IsSearchable, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -49,10 +47,15 @@ class Tenant extends Model
 
     /**
      * Get the users associated with the tenant.
+     * 
+     * Note: This should be configured by the application layer
+     * since atomic packages shouldn't reference app models directly.
+     * Override this in your app's Tenant model if needed.
      */
     public function users(): HasMany
     {
-        return $this->hasMany(\App\Models\User::class);
+        // TODO: Make this configurable via config or override in app
+        throw new \RuntimeException('users() relationship must be configured at application level');
     }
 
     /**
