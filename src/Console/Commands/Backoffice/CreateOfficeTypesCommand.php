@@ -56,20 +56,10 @@ class CreateOfficeTypesCommand extends Command
 
             if ($exists && $this->option('force')) {
                 OfficeType::where('code', $officeTypeData['code'])->delete();
-                OfficeType::create([
-                    'name' => $officeTypeData['name'],
-                    'code' => $officeTypeData['code'],
-                    'description' => $officeTypeData['description'] ?? null,
-                    'is_active' => true,
-                ]);
+                $this->createOfficeType($officeTypeData);
                 $this->line("Replaced existing '{$officeTypeData['name']}'");
             } else {
-                OfficeType::create([
-                    'name' => $officeTypeData['name'],
-                    'code' => $officeTypeData['code'],
-                    'description' => $officeTypeData['description'] ?? null,
-                    'is_active' => true,
-                ]);
+                $this->createOfficeType($officeTypeData);
                 $this->line("Created '{$officeTypeData['name']}'");
             }
 
@@ -81,5 +71,21 @@ class CreateOfficeTypesCommand extends Command
         $this->line("Skipped: {$skipped}");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Create an office type with the given data.
+     *
+     * @param array $officeTypeData
+     * @return OfficeType
+     */
+    private function createOfficeType(array $officeTypeData): OfficeType
+    {
+        return OfficeType::create([
+            'name' => $officeTypeData['name'],
+            'code' => $officeTypeData['code'],
+            'description' => $officeTypeData['description'] ?? null,
+            'is_active' => true,
+        ]);
     }
 }
