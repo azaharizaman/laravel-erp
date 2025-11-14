@@ -61,7 +61,7 @@ laravel-erp/
 │   ├── nexus-inventory-management/   # Inventory operations (Nexus\InventoryManagement)
 │   ├── nexus-sequencing-management/  # Serial numbering (Nexus\SequencingManagement)
 │   ├── nexus-settings-management/    # Settings system (Nexus\SettingsManagement)
-│   ├── nexus-tenancy-management/     # Multi-tenancy (Nexus\TenancyManagement)
+│   ├── nexus-tenancy-management/     # Multi-tenancy (Nexus\Tenancy)
 │   └── nexus-uom-management/         # Unit of measure (Nexus\UomManagement)
 ├── docs/                         # Documentation
 ├── composer.json                 # Monorepo root composer.json

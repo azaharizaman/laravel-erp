@@ -104,7 +104,7 @@ class IdentifyTenant
      * Load tenant from cache first, fall back to database if not cached
      *
      * @param  string  $tenantId  The tenant ID
-     * @return \Nexus\TenancyManagement\Models\Tenant|null
+     * @return \Nexus\Tenancy\Models\Tenant|null
      */
     protected function loadTenantFromCacheOrDatabase(string $tenantId)
     {

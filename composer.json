@@ -11,23 +11,22 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "laravel/framework": "^12.0",
+        "nexus/audit-log": "dev-main",
         "nexus/tenancy": "dev-main",
         "nexus/sequencing": "dev-main",
         "nexus/settings": "dev-main",
         "nexus/backoffice": "dev-main",
         "nexus/inventory": "dev-main",
         "nexus/uom": "dev-main",
-        "nexus/audit-log": "dev-main",
         "composer-phar/phpcbf": "^4.0"
     },
     "require-dev": {
         "laravel/pint": "^1.18",
         "phpunit/phpunit": "^12.0",
         "squizlabs/php_codesniffer": "^4.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0"
+        "pestphp/pest": "^4.0"
     },
     "autoload": {
         "psr-4": {
@@ -57,9 +56,45 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "composer/installers": true,
+            "pestphp/pest-plugin": true,
             "php-http/discovery": true
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/nexus-audit-log"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-backoffice"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-inventory"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-sequencing"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-settings"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-uom"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-tenancy"
+        },
+        {
+            "type": "path",
+            "url": "packages/nexus-workflow"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }

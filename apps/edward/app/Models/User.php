@@ -10,7 +10,7 @@ use Nexus\Erp\Support\Traits\HasPermissions;
 use Nexus\Erp\Support\Traits\HasTokens;
 use Nexus\Erp\Support\Traits\IsSearchable;
 use Nexus\Erp\Enums\UserStatus;
-use Nexus\TenancyManagement\Traits\BelongsToTenant;
+use Nexus\Tenancy\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;

@@ -104,7 +104,7 @@ mv nexus-uom-management nexus-uom
 sed -i 's/"nexus\/tenancy-management"/"nexus\/tenancy"/g' composer.json
 
 # Update PSR-4 namespace
-sed -i 's/"Nexus\\\\TenancyManagement\\\\":"/"Nexus\\\\Tenancy\\\\":"/g' composer.json
+sed -i 's/"Nexus\\\\Tenancy\\\\":"/"Nexus\\\\Tenancy\\\\":"/g' composer.json
 ```
 
 **Results:**
@@ -121,15 +121,15 @@ sed -i 's/"Nexus\\\\TenancyManagement\\\\":"/"Nexus\\\\Tenancy\\\\":"/g' compose
 ```bash
 # Update namespace declarations
 find packages/nexus-tenancy -type f -name "*.php" -exec sed -i \
-  's/namespace Nexus\\TenancyManagement/namespace Nexus\\Tenancy/g' {} \;
+  's/namespace Nexus\\Tenancy/namespace Nexus\\Tenancy/g' {} \;
 
 # Update use statements  
 find packages/nexus-tenancy -type f -name "*.php" -exec sed -i \
-  's/use Nexus\\TenancyManagement\\/use Nexus\\Tenancy\\/g' {} \;
+  's/use Nexus\\Tenancy\\/use Nexus\\Tenancy\\/g' {} \;
 ```
 
 **Applied to all 6 packages:**
-- ✅ nexus-tenancy: Nexus\TenancyManagement → Nexus\Tenancy
+- ✅ nexus-tenancy: Nexus\Tenancy → Nexus\Tenancy
 - ✅ nexus-sequencing: Nexus\SequencingManagement → Nexus\Sequencing  
 - ✅ nexus-settings: Nexus\SettingsManagement → Nexus\Settings
 - ✅ nexus-backoffice: Nexus\BackofficeManagement → Nexus\Backoffice
@@ -325,8 +325,8 @@ Git uses similarity index to detect renames:
 ### Namespace Migration Pattern
 ```php
 // Before
-namespace Nexus\TenancyManagement\Actions;
-use Nexus\TenancyManagement\Models\Tenant;
+namespace Nexus\Tenancy\Actions;
+use Nexus\Tenancy\Models\Tenant;
 
 // After  
 namespace Nexus\Tenancy\Actions;
@@ -379,13 +379,13 @@ mv nexus-uom-management nexus-uom
 
 # Update composer.json (example for tenancy)
 sed -i 's/"nexus\/tenancy-management"/"nexus\/tenancy"/g' nexus-tenancy/composer.json
-sed -i 's/"Nexus\\\\TenancyManagement\\\\":"/"Nexus\\\\Tenancy\\\\":"/g' nexus-tenancy/composer.json
+sed -i 's/"Nexus\\\\Tenancy\\\\":"/"Nexus\\\\Tenancy\\\\":"/g' nexus-tenancy/composer.json
 
 # Update PHP files (example for tenancy)
 find packages/nexus-tenancy -type f -name "*.php" \
-  -exec sed -i 's/namespace Nexus\\TenancyManagement/namespace Nexus\\Tenancy/g' {} \;
+  -exec sed -i 's/namespace Nexus\\Tenancy/namespace Nexus\\Tenancy/g' {} \;
 find packages/nexus-tenancy -type f -name "*.php" \
-  -exec sed -i 's/use Nexus\\TenancyManagement\\/use Nexus\\Tenancy\\/g' {} \;
+  -exec sed -i 's/use Nexus\\Tenancy\\/use Nexus\\Tenancy\\/g' {} \;
 
 # Rename service provider
 mv packages/nexus-tenancy/src/TenancyManagementServiceProvider.php \

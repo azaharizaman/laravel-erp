@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Domains\Core\Listeners;
 
-use Nexus\TenancyManagement\Actions\CreateTenantAction;
-use Nexus\TenancyManagement\Contracts\TenantRepositoryContract;
-use Nexus\TenancyManagement\Events\TenantCreatedEvent;
-use Nexus\TenancyManagement\Listeners\InitializeTenantDataListener;
+use Nexus\Tenancy\Actions\CreateTenantAction;
+use Nexus\Tenancy\Contracts\TenantRepositoryContract;
+use Nexus\Tenancy\Events\TenantCreatedEvent;
+use Nexus\Tenancy\Listeners\InitializeTenantDataListener;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;

@@ -166,7 +166,7 @@ composer install
   - Created nexus-tenancy-management package
     - Extracted all tenant-related functionality from core
     - 34 PHP files: Models, Services, Actions, Events, Policies, Middleware
-    - composer.json: nexus/tenancy-management, Nexus\TenancyManagement namespace
+    - composer.json: nexus/tenancy-management, Nexus\Tenancy namespace
     - Dependencies: nexus/contracts, lorisleiva/laravel-actions
     - Includes: Tenant model, TenantManager, Impersonation service, BelongsToTenant trait
   - Decided NOT to create nexus-identity-management

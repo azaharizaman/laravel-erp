@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Nexus\TenancyManagement\Contracts\TenantManagerContract;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Contracts\TenantManagerContract;
+use Nexus\Tenancy\Models\Tenant;
 
 if (! function_exists('tenant')) {
     /**

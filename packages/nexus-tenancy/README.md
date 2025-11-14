@@ -20,9 +20,9 @@ This package is part of the Nexus ERP monorepo and is automatically available wh
 ### Basic Tenant Operations
 
 ```php
-use Nexus\TenancyManagement\Actions\CreateTenantAction;
-use Nexus\TenancyManagement\Actions\UpdateTenantAction;
-use Nexus\TenancyManagement\Contracts\TenantManagerContract;
+use Nexus\Tenancy\Actions\CreateTenantAction;
+use Nexus\Tenancy\Actions\UpdateTenantAction;
+use Nexus\Tenancy\Contracts\TenantManagerContract;
 
 // Create a new tenant
 $tenant = CreateTenantAction::run([
@@ -44,7 +44,7 @@ UpdateTenantAction::run($tenant, [
 ### Tenant-Scoped Models
 
 ```php
-use Nexus\TenancyManagement\Traits\BelongsToTenant;
+use Nexus\Tenancy\Traits\BelongsToTenant;
 
 class Invoice extends Model
 {
@@ -57,8 +57,8 @@ class Invoice extends Model
 ### Tenant Impersonation
 
 ```php
-use Nexus\TenancyManagement\Actions\StartImpersonationAction;
-use Nexus\TenancyManagement\Actions\EndImpersonationAction;
+use Nexus\Tenancy\Actions\StartImpersonationAction;
+use Nexus\Tenancy\Actions\EndImpersonationAction;
 
 // Start impersonating a tenant (admin only)
 StartImpersonationAction::run($tenant, $user, 'Customer support request #123');

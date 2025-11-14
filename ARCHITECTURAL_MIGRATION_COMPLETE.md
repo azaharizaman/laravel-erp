@@ -66,7 +66,7 @@ Successfully migrated the Laravel ERP monorepo from a legacy package structure (
 **Created:** `packages/nexus-tenancy-management/`
 - Extracted tenant-related code from core
 - **Files moved:** 34 PHP files
-- **Namespace:** `Nexus\TenancyManagement`
+- **Namespace:** `Nexus\Tenancy`
 - **Contents:**
   - Models (Tenant)
   - Enums (TenantStatus)
@@ -84,7 +84,7 @@ Successfully migrated the Laravel ERP monorepo from a legacy package structure (
 **Updated:** `apps/headless-erp-app/`
 - **composer.json:** Removed `azaharizaman/erp-core`, added 9 nexus packages
 - **Namespace updates:** 20+ files in app/ directory
-  - Tenant classes: `Nexus\Erp\Core` → `Nexus\TenancyManagement`
+  - Tenant classes: `Nexus\Erp\Core` → `Nexus\Tenancy`
   - User classes: Kept `Nexus\Core` (UserStatus enum)
 - **Service providers:** Updated bootstrap/providers.php
 - **Package dependencies:** Fixed Laravel 12 and Carbon 3 compatibility
@@ -149,7 +149,7 @@ packages/
 ├── nexus-settings-management/    # Nexus\SettingsManagement
 │   └── Tenant-scoped configuration
 │
-├── nexus-tenancy-management/     # Nexus\TenancyManagement
+├── nexus-tenancy-management/     # Nexus\Tenancy
 │   └── Multi-tenancy, impersonation, tenant lifecycle
 │
 └── nexus-uom-management/         # Nexus\UomManagement
@@ -188,7 +188,7 @@ Nexus\
 ├── InventoryManagement\
 ├── SequencingManagement\
 ├── SettingsManagement\
-├── TenancyManagement\
+├── Tenancy\
 └── UomManagement\
 ```
 

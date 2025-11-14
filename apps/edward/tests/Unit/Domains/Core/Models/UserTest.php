@@ -6,7 +6,7 @@ namespace Tests\Unit\Domains\Core\Models;
 
 use App\Models\User;
 use App\Enums\UserStatus;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

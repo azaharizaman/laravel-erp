@@ -124,7 +124,7 @@ nexus-erp/
 | Package | Target Namespace | Target Composer Name |
 |---------|------------------|----------------------|
 | Contracts | `Nexus\Contracts` | `nexus/contracts` |
-| Tenancy | `Nexus\TenancyManagement` | `nexus/tenancy-management` |
+| Tenancy | `Nexus\Tenancy` | `nexus/tenancy-management` |
 | Identity | `Nexus\IdentityManagement` | `nexus/identity-management` |
 | Audit Log | `Nexus\AuditLog` | `nexus/audit-log` |
 | Sequencing | `Nexus\SequencingManagement` | `nexus/sequencing-management` |
@@ -571,8 +571,8 @@ cp core/database/migrations/*create_tenants_table.php nexus-tenancy-management/d
 
 ```bash
 cd nexus-tenancy-management
-find . -name "*.php" -exec sed -i 's/namespace Nexus\\Erp\\Core/namespace Nexus\\TenancyManagement/g' {} \;
-find . -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\TenancyManagement/g' {} \;
+find . -name "*.php" -exec sed -i 's/namespace Nexus\\Erp\\Core/namespace Nexus\\Tenancy/g' {} \;
+find . -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\Tenancy/g' {} \;
 ```
 
 **Extract Identity Logic (Optional - Only if Clean Separation Desired):**
@@ -615,13 +615,13 @@ find . -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\IdentityMan
     },
     "autoload": {
         "psr-4": {
-            "Nexus\\TenancyManagement\\": "src/"
+            "Nexus\\Tenancy\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Nexus\\TenancyManagement\\TenancyManagementServiceProvider"
+                "Nexus\\Tenancy\\TenancyManagementServiceProvider"
             ]
         }
     }
@@ -806,7 +806,7 @@ composer install
 cd apps/headless-erp-app
 
 # Update all use statements in app code
-find app -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\TenancyManagement/g' {} \;
+find app -name "*.php" -exec sed -i 's/use Nexus\\Erp\\Core/use Nexus\\Tenancy/g' {} \;
 find app -name "*.php" -exec sed -i 's/use Azaharizaman\\Laravel/use Nexus\\/g' {} \;
 
 # Specifically update UOM references
@@ -825,7 +825,7 @@ find app -name "*.php" -exec sed -i 's/use Azaharizaman\\LaravelBackoffice/use N
 cd apps/headless-erp-app/config
 
 # Update any configuration files referencing old packages
-find . -name "*.php" -exec sed -i 's/Nexus\\\\Erp\\\\Core/Nexus\\\\TenancyManagement/g' {} \;
+find . -name "*.php" -exec sed -i 's/Nexus\\\\Erp\\\\Core/Nexus\\\\Tenancy/g' {} \;
 find . -name "*.php" -exec sed -i 's/Azaharizaman\\\\Laravel/Nexus\\\\/g' {} \;
 ```
 
@@ -866,7 +866,7 @@ cp apps/headless-erp-app/app/Actions/CreateTenantAction.php \
    packages/nexus-tenancy-management/src/Actions/
 
 # Update namespace
-sed -i 's/namespace App\\Actions/namespace Nexus\\TenancyManagement\\Actions/' \
+sed -i 's/namespace App\\Actions/namespace Nexus\\Tenancy\\Actions/' \
    packages/nexus-tenancy-management/src/Actions/CreateTenantAction.php
 
 # Remove from app
@@ -934,7 +934,7 @@ mv apps/headless-erp-app/app/Models/Tenant.php \
 sed -i 's/namespace App\\Models/namespace Nexus\\IdentityManagement\\Models/' \
    packages/nexus-identity-management/src/Models/User.php
 
-sed -i 's/namespace App\\Models/namespace Nexus\\TenancyManagement\\Models/' \
+sed -i 's/namespace App\\Models/namespace Nexus\\Tenancy\\Models/' \
    packages/nexus-tenancy-management/src/Models/Tenant.php
 ```
 
@@ -943,7 +943,7 @@ sed -i 's/namespace App\\Models/namespace Nexus\\TenancyManagement\\Models/' \
 ```bash
 cd apps/headless-erp-app
 find . -name "*.php" -exec sed -i 's/use App\\Models\\User/use Nexus\\IdentityManagement\\Models\\User/g' {} \;
-find . -name "*.php" -exec sed -i 's/use App\\Models\\Tenant/use Nexus\\TenancyManagement\\Models\\Tenant/g' {} \;
+find . -name "*.php" -exec sed -i 's/use App\\Models\\Tenant/use Nexus\\Tenancy\\Models\\Tenant/g' {} \;
 ```
 
 ### **Step 5.5: Restructure App Directory**
@@ -1093,7 +1093,7 @@ class ArchitectureGuardServiceProvider extends ServiceProvider
         }
 
         $parts = explode('\\', $class);
-        return $parts[1] ?? null; // e.g., "TenancyManagement" from "Nexus\TenancyManagement\..."
+        return $parts[1] ?? null; // e.g., "Tenancy" from "Nexus\Tenancy\..."
     }
 
     /**
@@ -1302,7 +1302,7 @@ php artisan test --filter=PackageBoundaryTest
 # Run architecture guard in development
 # Should throw exceptions for violations
 php artisan tinker
->>> app(\Nexus\TenancyManagement\Services\TenantManager::class)
+>>> app(\Nexus\Tenancy\Services\TenantManager::class)
 // Should work (Core orchestrator calling package)
 
 >>> // From within a package test
@@ -1395,7 +1395,7 @@ composer require nexus/tenancy-management
 ## Usage
 
 ```php
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Nexus\Contracts\Tenancy\TenantManagerContract;
 
 $tenantManager = app(TenantManagerContract::class);
@@ -1444,7 +1444,7 @@ Create `docs/PACKAGE_MIGRATION_GUIDE.md`:
 
 | Old Name | New Name | Namespace Change |
 |----------|----------|------------------|
-| `azaharizaman/erp-core` | `nexus/tenancy-management` + `nexus/identity-management` | `Nexus\Erp\Core` → `Nexus\TenancyManagement` + `Nexus\IdentityManagement` |
+| `azaharizaman/erp-core` | `nexus/tenancy-management` + `nexus/identity-management` | `Nexus\Erp\Core` → `Nexus\Tenancy` + `Nexus\IdentityManagement` |
 | `azaharizaman/laravel-uom-management` | `nexus/uom-management` | `Azaharizaman\LaravelUomManagement` → `Nexus\UomManagement` |
 | ... | ... | ... |
 
@@ -1456,7 +1456,7 @@ use Nexus\Erp\Core\Models\Tenant;
 use Azaharizaman\LaravelUomManagement\Services\UomConverter;
 
 // New
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Nexus\Contracts\Uom\UomConverterContract;
 ```
 
@@ -1676,7 +1676,7 @@ case "$1" in
     
     "update-imports")
         # Update all imports in main app
-        find apps/headless-erp-app -name "*.php" -exec sed -i 's/Nexus\\Erp\\Core/Nexus\\TenancyManagement/g' {} \;
+        find apps/headless-erp-app -name "*.php" -exec sed -i 's/Nexus\\Erp\\Core/Nexus\\Tenancy/g' {} \;
         ;;
     
     *)

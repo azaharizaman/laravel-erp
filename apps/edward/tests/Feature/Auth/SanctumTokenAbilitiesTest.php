@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 

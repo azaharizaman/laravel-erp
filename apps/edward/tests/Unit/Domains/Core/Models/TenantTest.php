@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Domains\Core\Models;
 
 use App\Models\User;
-use Nexus\TenancyManagement\Enums\TenantStatus;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Enums\TenantStatus;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

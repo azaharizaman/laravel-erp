@@ -15,6 +15,9 @@
 
 1. Introduction and Architectural Mandate  
 2. Defining Architectural Boundaries  
+   - A. The Atomic Package (The "Service Layer")
+   - B. Nexus ERP Core (The "Orchestrator")
+   - C. Action Orchestration Layer (Laravel Actions Pattern)
 3. Technical Stack  
 4. Feature Toggling Architecture  
 5. Security Model and Governance  
@@ -82,6 +85,283 @@ The main users are system integrators, developers or machine-to-machine services
 - **Usage:** `cd apps/edward && php artisan edward:menu`
 - **Features:** Interactive CLI interface with ASCII art banner, 7 module menus (Tenant, User, Inventory, Settings, Reports, Search, Audit)
 - **Target Users:** Developers, system integrators, automated workflows, CI/CD pipelines
+
+### **C. Action Orchestration Layer (Laravel Actions Pattern)**
+
+The Nexus ERP Core uses **lorisleiva/laravel-actions** as the primary orchestration mechanism for exposing business logic from atomic packages through multiple entry points without code duplication.
+
+#### **The Problem: Repetitive Action Implementation**
+
+Without orchestration, each atomic package would need to implement the same business logic multiple times for different contexts:
+
+```php
+// ❌ WITHOUT ORCHESTRATION (Repetitive Code)
+
+// In atomic package - Web controller
+class TenantController {
+    public function store(Request $request) {
+        // Validation, business logic, response
+    }
+}
+
+// In atomic package - CLI command
+class CreateTenantCommand extends Command {
+    public function handle() {
+        // Same validation, same business logic, different interface
+    }
+}
+
+// In atomic package - Queue job
+class CreateTenantJob implements ShouldQueue {
+    public function handle() {
+        // Same validation, same business logic, queued execution
+    }
+}
+
+// In atomic package - Event listener
+class TenantCreatedListener {
+    public function handle($event) {
+        // Same business logic triggered by events
+    }
+}
+```
+
+**Problems with this approach:**
+1. **Code Duplication:** Same business logic written 4+ times
+2. **Maintenance Burden:** Bug fixes require updating multiple locations
+3. **Testing Overhead:** Each entry point needs separate test coverage
+4. **Inconsistency Risk:** Logic can drift between implementations
+
+#### **The Solution: Single Action, Multiple Invocations**
+
+The Nexus ERP Core leverages **lorisleiva/laravel-actions** to define business operations ONCE in the orchestration layer, making them automatically available as:
+
+1. **Controller Actions** (Web/API requests)
+2. **Console Commands** (CLI/Artisan)
+3. **Queued Jobs** (Background processing)
+4. **Event Listeners** (Event-driven architecture)
+5. **Direct Method Calls** (Programmatic usage)
+
+```php
+// ✅ WITH ORCHESTRATION (Single Implementation)
+
+namespace Nexus\Erp\Actions\Tenant;
+
+use Lorisleiva\Actions\Concerns\AsAction;
+use Nexus\Tenancy\Contracts\TenantRepositoryContract;
+
+class CreateTenantAction
+{
+    use AsAction;
+    
+    public function __construct(
+        private readonly TenantRepositoryContract $repository
+    ) {}
+    
+    /**
+     * Main business logic - defined ONCE
+     */
+    public function handle(array $data): Tenant
+    {
+        // Validation
+        $validated = $this->validate($data);
+        
+        // Business logic from atomic package
+        $tenant = $this->repository->create($validated);
+        
+        // Cross-package orchestration
+        event(new TenantCreatedEvent($tenant));
+        
+        return $tenant;
+    }
+    
+    // Automatically available as:
+    // 1. Controller: POST /api/tenants → CreateTenantAction::run($data)
+    // 2. Command: php artisan tenant:create → CreateTenantAction::dispatch($data)
+    // 3. Job: CreateTenantAction::dispatch($data)->onQueue('default')
+    // 4. Listener: CreateTenantAction::run($data)
+}
+```
+
+#### **Why Atomic Packages Don't Need Laravel Actions**
+
+**Atomic packages** are headless, self-contained business logic libraries. They:
+
+1. **Export Contracts and Repositories:** Define interfaces for data access
+2. **Provide Domain Models:** Eloquent models with business rules
+3. **Emit Events:** Signal state changes to external observers
+4. **Have NO presentation layer:** No controllers, commands, or jobs
+
+**Example - Atomic Package Structure:**
+
+```
+nexus-tenancy/
+├── src/
+│   ├── Contracts/
+│   │   └── TenantRepositoryContract.php    # Interface definition
+│   ├── Models/
+│   │   └── Tenant.php                      # Domain model
+│   ├── Repositories/
+│   │   └── TenantRepository.php            # Data access implementation
+│   ├── Events/
+│   │   └── TenantCreatedEvent.php          # Domain event
+│   └── TenancyServiceProvider.php          # Package registration
+└── composer.json                             # NO laravel-actions dependency
+```
+
+**Why this works:**
+- Atomic packages are **pure business logic** with no awareness of how they'll be invoked
+- They provide **building blocks** (repositories, models, events) that Nexus ERP orchestrates
+- Adding Laravel Actions to atomic packages would create unnecessary coupling to a specific invocation pattern
+- Keeps packages lightweight, testable, and framework-agnostic (can be used outside Laravel if needed)
+
+#### **Nexus ERP as the Universal Orchestrator**
+
+The Nexus ERP Core (`nexus/erp`) is responsible for:
+
+1. **Registering Actions:** All performable operations in `src/Actions/` directory
+2. **Dependency Injection:** Binding atomic package contracts to implementations
+3. **Route Registration:** Mapping HTTP endpoints to actions
+4. **Command Registration:** Making actions available via Artisan CLI
+5. **Queue Configuration:** Defining which actions run asynchronously
+6. **Event Binding:** Connecting domain events to action listeners
+
+**Action Registration in Nexus ERP:**
+
+```php
+// In Nexus\Erp\ErpServiceProvider
+
+public function register(): void
+{
+    // Bind atomic package implementations
+    $this->app->bind(
+        TenantRepositoryContract::class,
+        TenantRepository::class
+    );
+}
+
+public function boot(): void
+{
+    // Actions are auto-discovered from src/Actions/
+    // No manual registration needed with lorisleiva/laravel-actions
+    
+    // API Route: POST /api/v1/tenants → CreateTenantAction
+    // Command: php artisan tenant:create → CreateTenantAction
+    // Job: CreateTenantAction::dispatch()
+    // Listener: CreateTenantAction::run()
+}
+```
+
+#### **Action Organization in Nexus ERP**
+
+```
+src/
+├── Actions/
+│   ├── Tenant/
+│   │   ├── CreateTenantAction.php           # Uses nexus-tenancy
+│   │   ├── SuspendTenantAction.php
+│   │   └── ArchiveTenantAction.php
+│   ├── Inventory/
+│   │   ├── CreateInventoryItemAction.php    # Uses nexus-inventory
+│   │   ├── AdjustStockAction.php
+│   │   └── TransferStockAction.php
+│   ├── Accounting/
+│   │   ├── CreateJournalEntryAction.php     # Uses nexus-accounting
+│   │   └── PostInvoiceAction.php
+│   └── CrossDomain/
+│       └── CreatePurchaseOrderAction.php    # Orchestrates multiple packages
+```
+
+#### **Benefits of This Architecture**
+
+| Benefit | Description |
+|---------|-------------|
+| **DRY Principle** | Write business logic once, use everywhere (API, CLI, Queue, Events) |
+| **Consistent Behavior** | Same validation and business rules across all entry points |
+| **Easier Testing** | Single test suite covers all invocation methods |
+| **Atomic Package Independence** | Packages remain framework-agnostic and lightweight |
+| **Centralized Orchestration** | Nexus ERP controls how atomic packages interact |
+| **Flexible Invocation** | Switch between synchronous/asynchronous execution without code changes |
+| **Auto-Discovery** | Laravel Actions provides automatic route/command registration |
+| **Type Safety** | Full IDE support with constructor injection and type hints |
+
+#### **Example: Multi-Entry Point Usage**
+
+```php
+// 1. HTTP API Request (Synchronous)
+POST /api/v1/tenants
+Content-Type: application/json
+{
+    "name": "Acme Corp",
+    "domain": "acme.example.com"
+}
+// → CreateTenantAction::run($request->validated())
+
+// 2. Artisan Command (Synchronous)
+php artisan tenant:create --name="Acme Corp" --domain="acme.example.com"
+// → CreateTenantAction::run(['name' => ..., 'domain' => ...])
+
+// 3. Queued Job (Asynchronous)
+CreateTenantAction::dispatch(['name' => 'Acme Corp', 'domain' => 'acme.example.com']);
+// → Queued for background processing
+
+// 4. Event Listener (Event-Driven)
+class HandleNewRegistration {
+    public function handle(UserRegisteredEvent $event) {
+        // Automatically create tenant for new user
+        CreateTenantAction::run([
+            'name' => $event->user->company_name,
+            'domain' => $event->user->subdomain
+        ]);
+    }
+}
+
+// 5. Direct PHP Call (Programmatic)
+$tenant = app(CreateTenantAction::class)->handle([
+    'name' => 'Acme Corp',
+    'domain' => 'acme.example.com'
+]);
+```
+
+#### **Key Architectural Rules**
+
+1. **✅ DO:** Place all actions in `Nexus\Erp\Actions\` namespace in the orchestration layer
+2. **✅ DO:** Use `AsAction` trait from lorisleiva/laravel-actions for all action classes
+3. **✅ DO:** Inject atomic package contracts via constructor dependency injection
+4. **✅ DO:** Use actions to coordinate multiple atomic packages (cross-domain operations)
+5. **❌ DON'T:** Add laravel-actions dependency to atomic packages
+6. **❌ DON'T:** Create controllers, commands, or jobs separately when an action suffices
+7. **❌ DON'T:** Put business logic in controllers - always delegate to actions
+8. **❌ DON'T:** Call atomic package repositories directly from controllers - use actions
+
+#### **Testing Actions**
+
+```php
+// Single test covers all entry points
+test('can create tenant', function () {
+    // Arrange
+    $data = [
+        'name' => 'Test Corp',
+        'domain' => 'test.example.com'
+    ];
+    
+    // Act - Test the action directly
+    $tenant = CreateTenantAction::run($data);
+    
+    // Assert
+    expect($tenant)->toBeInstanceOf(Tenant::class);
+    expect($tenant->name)->toBe('Test Corp');
+    
+    // This single test validates:
+    // - HTTP API endpoint
+    // - CLI command
+    // - Queue job
+    // - Event listener
+    // - Direct invocation
+});
+```
+
+This architecture ensures that Nexus ERP remains a thin orchestration layer while atomic packages stay focused on pure business logic, achieving maximum modularity and reusability.
 
 ## **3\. Technical Stack**
 
@@ -408,13 +688,33 @@ This section clarifies why certain complex patterns are **not mandated system-wi
 
 ### **A. Architectural & Decoupling Core (The System Foundation)**
 
-These packages manage the environment, security boundaries, and runtime isolation for the entire application. **Note:** Contract definitions (PHP Interfaces) for inter-package communication are managed by **nexus/erp** as the orchestration layer, not in a separate package.
+These packages manage the environment, security boundaries, runtime isolation, and cross-cutting capabilities for the entire application. **Note:** Contract definitions (PHP Interfaces) for inter-package communication, Settings Management, and Feature Toggling orchestration are managed by **nexus/erp** as the orchestration layer, not in separate packages.
+
+#### **Core Infrastructure Packages**
 
 | Package Name | Domain Responsibility |
 | :---- | :---- |
 | **nexus-tenancy** | **Multi-Tenancy:** Manages the definition, configuration, and runtime isolation of data and resources for separate tenants/companies. |
 | **nexus-identity-management** | User, Role, and Permission management (Authentication, Authorization, RBAC). |
-| **nexus-feature-toggling-management** | **Feature Flag Persistence:** Manages the definition, storage, and CRUD operations for feature flags at the system, tenant, and user levels. |
+
+#### **Cross-Cutting Capability Packages**
+
+| Package Name | Domain Responsibility |
+| :---- | :---- |
+| **nexus-audit-log** | **Cross-cutting Logging:** Provides standardized, transactional tracking of model changes (who, what, when, field changes). All packages will be configured to use this service. |
+| **nexus-workflow** | **Workflow Management:** Integrates workflow execution logic (stateless computation of state transitions, rule evaluation, approval logic, escalation triggers) with state persistence (tracking status, history, users, and instance data of running workflows). **Rationale:** Workflow engine and state management are tightly coupled and always deployed together. |
+| **nexus-document-management** | Secure storage, version control, and access control for attachments and documents. |
+| **nexus-notification-service** | Centralized queueing and dispatching of notifications (Email, SMS, internal alerts, WebSockets). |
+| **nexus-ai-automation-management** | **AI/ML Inference and Orchestration:** Provides standardized contracts and services for AI/ML inference (e.g., document classification, data extraction, demand prediction, sentiment analysis). Handles external API calls, model response normalization, and cost/usage tracking. |
+
+#### **Orchestration Layer (Nexus/Erp Namespace)**
+
+These capabilities are NOT published as separate packages because they only make sense as part of the orchestration layer:
+
+| Component | Domain Responsibility |
+| :---- | :---- |
+| **Settings Management** | Key-value store for global application, tenant, or user-specific settings. Manages feature flag orchestration (determining which features are available to end users). **Rationale:** Settings and feature toggling are orchestration concerns that control how packages interact and what capabilities are exposed. Cannot be meaningfully used standalone. |
+| **Contract Definitions** | PHP Interfaces for inter-package communication, ensuring packages remain decoupled. |
 
 ### **B. Fundamental Master Data & Management Core (The ERP Constants)**
 
@@ -422,7 +722,7 @@ These packages manage system constants and configuration that all other business
 
 | Package Name | Domain Responsibility |
 | :---- | :---- |
-| **nexus-organization-master** | Defines the organizational structure, including Offices, Departments, Teams, Units, and Staffing Hierarchy. |
+| **nexus-backoffice** | Defines the organizational structure, including Offices, Departments, Teams, Units, and Staffing Hierarchy. |
 | **nexus-fiscal-calendar-master** | Defines static master data for Fiscal Years, Periods, and statutory holidays. |
 | **nexus-sequencing** | Controls the generation, persistence, and validation of all document numbering sequences (e.g., PO-0001, Invoice-0002). |
 | **nexus-tax-management** | Centralized tax codes, rates, rules, and jurisdiction handling. |
@@ -438,28 +738,9 @@ These packages manage the primary domain models and transactional processes that
 | :---- | :---- |
 | **nexus-party-management** | Management of all "Parties" (Customers, Vendors, Employees, Contacts, Legal Entities). |
 | **nexus-employee-master** | Core HR master data (Job Titles, Departments, Reporting Hierarchy, basic Employee Profile). **Relies on nexus-organization-master.** |
-| **nexus-accounts-payable-management** | Manages the full lifecycle of Vendor Invoices, Payment Authorizations, and reconciliation against the Vendor Ledger. |
-| **nexus-accounts-receivable-management** | Manages the full lifecycle of Customer Invoices, Receipts/Collections, and reconciliation against the Customer Ledger. |
-| **nexus-cash-and-bank-management** | Manages all Bank Transaction Logs, Cash Accounts, Bank Reconciliation processes, and transactional fund transfers. |
-| **nexus-ledger-interface** | Core double-entry accounting engine (General Ledger, Chart of Accounts, Journal Entries). |
-| **nexus-payment-interface** | Bank account master, payment method processing, and transaction execution/reconciliation. |
+| **nexus-accounting** | **Complete Financial Management:** Integrates General Ledger, Chart of Accounts, Journal Entries, Accounts Payable (Vendor Invoices, Payment Authorizations, Vendor Ledger reconciliation), Accounts Receivable (Customer Invoices, Receipts/Collections, Customer Ledger reconciliation), Cash and Bank Management (Bank Transaction Logs, Cash Accounts, Bank Reconciliation), and Payment Processing (payment method execution, transaction reconciliation). **Rationale:** These components are tightly coupled and communicate constantly (AP → GL, AR → GL, Payments → Bank → GL). Consolidating them eliminates orchestration overhead while maintaining internal modularity through namespaces and bounded contexts. |
 
-### **D. Universal Supporting Packages (Good to Have for General ERP)**
-
-These packages provide critical cross-cutting capabilities but are not strictly necessary for the initial launch of basic financial modules.
-
-| Package Name | Domain Responsibility |
-| :---- | :---- |
-| **nexus-ai-automation-management** | **AI/ML Inference and Orchestration:** Provides standardized contracts and services for AI/ML inference (e.g., document classification, data extraction, demand prediction, sentiment analysis). Handles external API calls, model response normalization, and cost/usage tracking. |
-| **nexus-audit-log** | **Cross-cutting Logging:** Provides standardized, transactional tracking of model changes (who, what, when, field changes). All packages will be configured to use this service. |
-| **nexus-sequencing** | Unique serial number generation, versioning, status tracking, and voiding (as described in the prompt). |
-| **nexus-workflow-engine** | **Execution Logic:** The pure, stateless computation of state transitions, rule evaluation, **approval logic**, and **escalation triggers.** |
-| **nexus-workflow-management** | **State Persistence:** Tracking the status, history, users, and instance data of all running workflows (e.g., preventing duplicate workflows for a given document). |
-| **nexus-document-management** | Secure storage, version control, and access control for attachments and documents. |
-| **nexus-notification-service** | Centralized queueing and dispatching of notifications (Email, SMS, internal alerts, WebSockets). |
-| **nexus-settings** | Key-value store for global application, tenant, or user-specific settings. |
-
-### **E. Universal Commerce & Operations Packages (Strongly Recommended)**
+### **D. Universal Commerce & Operations Packages (Strongly Recommended)**
 
 These packages manage fundamental business transactions and resources (inventory, assets, time) that are critical for nearly every industry, even if the specific implementation details (e.g., manufacturing vs. trading) differ slightly in the Core Orchestrator.
 
@@ -471,9 +752,9 @@ These packages manage fundamental business transactions and resources (inventory
 | **nexus-asset-management** | Tracking internal (or customer-owned) fixed assets, warranty, depreciation, and service history. | Manufacturing, Maintenance, Fleet, Government, Legal (IT/Equipment) |
 | **nexus-time-activity-management** | Highly granular time entry tracking (e.g., for employee time or client billing), activity logs, and expense association. | General Service, Manufacturing (Labor), Legal, Maintenance, Medical |
 
-### **F. Industry-Specific Packages**
+### **E. Industry-Specific Packages**
 
-These packages are necessary for the vertical functionality required by a specific industry. The original "General Service/Trading" modules have been absorbed into 5C. Separating these packages by industry ensures clarity and makes the ERP's extension points immediately obvious.
+These packages are necessary for the vertical functionality required by a specific industry. The original "General Service/Trading" modules have been absorbed into Section C. Separating these packages by industry ensures clarity and makes the ERP's extension points immediately obvious.
 
 #### **1\. Manufacturing (Must-Have: 2, Good-to-Have: 2\)**
 

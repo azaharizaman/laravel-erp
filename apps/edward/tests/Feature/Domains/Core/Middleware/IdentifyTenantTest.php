@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Domains\Core\Middleware;
 
 use App\Models\User;
-use Nexus\TenancyManagement\Contracts\TenantManagerContract;
-use Nexus\TenancyManagement\Middleware\IdentifyTenant;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Contracts\TenantManagerContract;
+use Nexus\Tenancy\Middleware\IdentifyTenant;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Tests\TestCase;

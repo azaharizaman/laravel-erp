@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nexus\Erp\Console\Commands\Tenant;
 
-use Nexus\TenancyManagement\Actions\CreateTenantAction;
+use Nexus\Tenancy\Actions\CreateTenantAction;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 

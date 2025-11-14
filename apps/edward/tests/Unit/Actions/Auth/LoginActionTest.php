@@ -6,7 +6,7 @@ use App\Actions\Auth\LoginAction;
 use App\Exceptions\AccountLockedException;
 use App\Models\User;
 use App\Enums\UserStatus;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 

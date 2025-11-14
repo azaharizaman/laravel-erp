@@ -10,7 +10,7 @@ return [
     | to add custom functionality or override the default behavior.
     |
     */
-    'tenant_model' => \Nexus\TenancyManagement\Models\Tenant::class,
+    'tenant_model' => \Nexus\Tenancy\Models\Tenant::class,
 
     /*
     |--------------------------------------------------------------------------

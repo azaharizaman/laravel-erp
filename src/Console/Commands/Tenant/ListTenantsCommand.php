@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Nexus\Erp\Console\Commands\Tenant;
 
-use Nexus\TenancyManagement\Contracts\TenantRepositoryContract;
-use Nexus\TenancyManagement\Enums\TenantStatus;
+use Nexus\Tenancy\Contracts\TenantRepositoryContract;
+use Nexus\Tenancy\Enums\TenantStatus;
 use Illuminate\Console\Command;
 
 /**

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Domains\Core\Actions;
 
-use Nexus\TenancyManagement\Actions\CreateTenantAction;
-use Nexus\TenancyManagement\Contracts\TenantRepositoryContract;
-use Nexus\TenancyManagement\Enums\TenantStatus;
-use Nexus\TenancyManagement\Events\TenantCreatedEvent;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Actions\CreateTenantAction;
+use Nexus\Tenancy\Contracts\TenantRepositoryContract;
+use Nexus\Tenancy\Enums\TenantStatus;
+use Nexus\Tenancy\Events\TenantCreatedEvent;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;

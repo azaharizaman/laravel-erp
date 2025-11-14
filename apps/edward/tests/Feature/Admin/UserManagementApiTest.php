@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Models\User;
 use App\Support\Contracts\PermissionServiceContract;
 use App\Enums\UserStatus;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

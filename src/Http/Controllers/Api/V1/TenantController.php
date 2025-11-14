@@ -8,11 +8,11 @@ use Nexus\Erp\Http\Controllers\Controller;
 use Nexus\Erp\Http\Requests\StoreTenantRequest;
 use Nexus\Erp\Http\Requests\UpdateTenantRequest;
 use Nexus\Erp\Http\Resources\TenantResource;
-use Nexus\TenancyManagement\Actions\ArchiveTenantAction;
-use Nexus\TenancyManagement\Actions\CreateTenantAction;
-use Nexus\TenancyManagement\Actions\UpdateTenantAction;
-use Nexus\TenancyManagement\Contracts\TenantRepositoryContract;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Actions\ArchiveTenantAction;
+use Nexus\Tenancy\Actions\CreateTenantAction;
+use Nexus\Tenancy\Actions\UpdateTenantAction;
+use Nexus\Tenancy\Contracts\TenantRepositoryContract;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -119,7 +119,7 @@ class TenantController extends Controller
         // Eager load users count if requested
         if (request('with_users_count')) {
             $tenant->loadCount(['users' => function ($query) {
-                $query->withoutGlobalScope(\Nexus\TenancyManagement\Scopes\TenantScope::class);
+                $query->withoutGlobalScope(\Nexus\Tenancy\Scopes\TenantScope::class);
             }]);
         }
 

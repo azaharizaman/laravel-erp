@@ -63,7 +63,7 @@ class TenancyServiceProvider extends ServiceProvider
         ], 'tenancy-migrations');
 
         // Register policies
-        Gate::policy(Tenant::class, \Nexus\TenancyManagement\Policies\TenantPolicy::class);
+        Gate::policy(Tenant::class, \Nexus\Tenancy\Policies\TenantPolicy::class);
 
         // Register middleware
         $this->app['router']->aliasMiddleware('tenant', IdentifyTenant::class);

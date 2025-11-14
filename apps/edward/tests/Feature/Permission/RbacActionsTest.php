@@ -6,7 +6,7 @@ use App\Actions\Permission\AssignRoleToUserAction;
 use App\Actions\Permission\CreateRoleAction;
 use App\Models\User;
 use App\Support\Contracts\PermissionServiceContract;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

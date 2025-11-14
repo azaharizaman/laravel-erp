@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Nexus\Erp\Http\Requests;
 
-use Nexus\TenancyManagement\Enums\TenantStatus;
+use Nexus\Tenancy\Enums\TenantStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

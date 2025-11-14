@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Unit\Domains\Core\Traits;
 
 use App\Models\User;
-use Nexus\TenancyManagement\Models\Tenant;
-use Nexus\TenancyManagement\Scopes\TenantScope;
-use Nexus\TenancyManagement\Traits\BelongsToTenant;
+use Nexus\Tenancy\Models\Tenant;
+use Nexus\Tenancy\Scopes\TenantScope;
+use Nexus\Tenancy\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

@@ -103,7 +103,7 @@ The document provides detailed step-by-step instructions for transforming the cu
 
 | Old Namespace | → | New Namespace |
 |---------------|---|---------------|
-| `Nexus\Erp\Core` | **SPLIT** | `Nexus\TenancyManagement` + `Nexus\IdentityManagement` |
+| `Nexus\Erp\Core` | **SPLIT** | `Nexus\Tenancy` + `Nexus\IdentityManagement` |
 | `Azaharizaman\LaravelUomManagement` | → | `Nexus\UomManagement` |
 | `Azaharizaman\LaravelInventoryManagement` | → | `Nexus\InventoryManagement` |
 | `Azaharizaman\LaravelBackoffice` | → | `Nexus\OrganizationMaster` |

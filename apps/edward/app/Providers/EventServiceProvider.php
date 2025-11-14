@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Nexus\Erp\Providers;
 
-use Nexus\TenancyManagement\Events\TenantArchivedEvent;
-use Nexus\TenancyManagement\Events\TenantCreatedEvent;
-use Nexus\TenancyManagement\Events\TenantUpdatedEvent;
-use Nexus\TenancyManagement\Listeners\InitializeTenantDataListener;
+use Nexus\Tenancy\Events\TenantArchivedEvent;
+use Nexus\Tenancy\Events\TenantCreatedEvent;
+use Nexus\Tenancy\Events\TenantUpdatedEvent;
+use Nexus\Tenancy\Listeners\InitializeTenantDataListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 /**

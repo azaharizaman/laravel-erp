@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\UomCategory;
 use App\Models\Uom;
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Database\Seeders\UomSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

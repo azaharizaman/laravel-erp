@@ -59,7 +59,7 @@ Successfully migrated from:
 **SHA:** `dfae626`
 - Created `packages/nexus-tenancy-management/`
 - Extracted 34 files from core
-- Namespace: `Nexus\TenancyManagement`
+- Namespace: `Nexus\Tenancy`
 - Contents: Tenant model, actions, policies, middleware, services
 
 ### 6. Phase 5: Update main application to use new atomic packages
@@ -104,7 +104,7 @@ packages/
 ├── nexus-inventory-management/   # Nexus\InventoryManagement
 ├── nexus-sequencing-management/  # Nexus\SequencingManagement
 ├── nexus-settings-management/    # Nexus\SettingsManagement
-├── nexus-tenancy-management/     # Nexus\TenancyManagement
+├── nexus-tenancy-management/     # Nexus\Tenancy
 └── nexus-uom-management/         # Nexus\UomManagement
 ```
 
@@ -123,7 +123,7 @@ packages/
 ### Namespace Changes
 | Old | New |
 |-----|-----|
-| `Nexus\Erp\Core\Models\Tenant` | `Nexus\TenancyManagement\Models\Tenant` |
+| `Nexus\Erp\Core\Models\Tenant` | `Nexus\Tenancy\Models\Tenant` |
 | `Nexus\Erp\Core\Contracts\*` | `Nexus\Contracts\*` |
 | `Azaharizaman\LaravelBackoffice\*` | `Nexus\BackofficeManagement\*` |
 | `Azaharizaman\LaravelInventoryManagement\*` | `Nexus\InventoryManagement\*` |
@@ -179,7 +179,7 @@ All packages auto-discovered via `extra.laravel.providers` in composer.json:
         "Nexus\\InventoryManagement\\InventoryManagementServiceProvider",
         "Nexus\\SequencingManagement\\SequencingManagementServiceProvider",
         "Nexus\\SettingsManagement\\SettingsManagementServiceProvider",
-        "Nexus\\TenancyManagement\\TenancyManagementServiceProvider",
+        "Nexus\\Tenancy\\TenancyManagementServiceProvider",
         "Nexus\\UomManagement\\UomManagementServiceProvider"
       ]
     }
@@ -224,7 +224,7 @@ Nexus\
 ├── InventoryManagement\ # Items, warehouses, stock
 ├── SequencingManagement\ # Serial numbers
 ├── SettingsManagement\  # Configuration
-├── TenancyManagement\   # Multi-tenancy
+├── Tenancy\   # Multi-tenancy
 └── UomManagement\      # Unit conversions
 ```
 
@@ -242,7 +242,7 @@ use Nexus\Erp\Core\Contracts\TenantRepositoryContract;
 use Azaharizaman\LaravelBackoffice\Models\Company;
 
 // NEW (correct)
-use Nexus\TenancyManagement\Models\Tenant;
+use Nexus\Tenancy\Models\Tenant;
 use Nexus\Contracts\TenantRepositoryContract;
 use Nexus\BackofficeManagement\Models\Company;
 ```
@@ -292,9 +292,9 @@ Use find & replace in your IDE:
 
 | Find | Replace |
 |------|---------|
-| `Nexus\Erp\Core\Models\Tenant` | `Nexus\TenancyManagement\Models\Tenant` |
-| `Nexus\Erp\Core\Enums\TenantStatus` | `Nexus\TenancyManagement\Enums\TenantStatus` |
-| `Nexus\Erp\Core\Actions\CreateTenantAction` | `Nexus\TenancyManagement\Actions\CreateTenantAction` |
+| `Nexus\Erp\Core\Models\Tenant` | `Nexus\Tenancy\Models\Tenant` |
+| `Nexus\Erp\Core\Enums\TenantStatus` | `Nexus\Tenancy\Enums\TenantStatus` |
+| `Nexus\Erp\Core\Actions\CreateTenantAction` | `Nexus\Tenancy\Actions\CreateTenantAction` |
 | `Nexus\Erp\Core\Contracts\` | `Nexus\Contracts\` |
 | `Azaharizaman\LaravelBackoffice\` | `Nexus\BackofficeManagement\` |
 | `Azaharizaman\LaravelInventoryManagement\` | `Nexus\InventoryManagement\` |
@@ -309,7 +309,7 @@ return [
     
     // Add new
     Nexus\Core\CoreServiceProvider::class,
-    Nexus\TenancyManagement\TenancyManagementServiceProvider::class,
+    Nexus\Tenancy\TenancyManagementServiceProvider::class,
 ];
 ```
 

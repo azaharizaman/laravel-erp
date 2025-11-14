@@ -13,7 +13,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * Transforms tenant model to JSON:API format.
  * Conditionally includes sensitive data (configuration) only for admins.
  *
- * @property \Nexus\TenancyManagement\Models\Tenant $resource
+ * @property \Nexus\Tenancy\Models\Tenant $resource
  */
 class TenantResource extends JsonResource
 {
