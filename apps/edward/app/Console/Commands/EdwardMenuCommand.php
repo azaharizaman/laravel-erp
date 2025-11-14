@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Hash;
+use Nexus\Erp\Models\User;
 use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
+use function Laravel\Prompts\password;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\error;
+use function Laravel\Prompts\warning;
 
 /**
  * Edward - Terminal-based ERP Interface
@@ -32,12 +37,25 @@ class EdwardMenuCommand extends Command
     protected $description = 'Launch Edward - Terminal-based ERP interface for Nexus ERP';
 
     /**
+     * Currently authenticated user
+     *
+     * @var User|null
+     */
+    protected ?User $currentUser = null;
+
+    /**
      * Execute the console command.
      *
      * @return int
      */
     public function handle(): int
     {
+        // Show login screen
+        if (!$this->performLogin()) {
+            $this->error('Login failed. Exiting Edward.');
+            return self::FAILURE;
+        }
+
         $this->displayWelcomeBanner();
         
         while (true) {
@@ -50,6 +68,86 @@ class EdwardMenuCommand extends Command
             
             $this->handleMenuChoice($choice);
         }
+    }
+
+    /**
+     * Perform user login
+     *
+     * @return bool
+     */
+    protected function performLogin(): bool
+    {
+        $this->displayLoginBanner();
+
+        $maxAttempts = 3;
+        $attempts = 0;
+
+        while ($attempts < $maxAttempts) {
+            $email = text(
+                label: 'Email',
+                placeholder: 'user@example.com',
+                required: true,
+                validate: fn (string $value) => filter_var($value, FILTER_VALIDATE_EMAIL) 
+                    ? null 
+                    : 'Please enter a valid email address'
+            );
+
+            $password = password(
+                label: 'Password',
+                placeholder: 'Enter your password',
+                required: true
+            );
+
+            // Attempt authentication
+            $user = User::where('email', $email)->first();
+
+            if ($user && Hash::check($password, $user->password)) {
+                $this->currentUser = $user;
+                $this->newLine();
+                info("Welcome back, {$user->name}!");
+                $this->newLine();
+                sleep(1);
+                return true;
+            }
+
+            $attempts++;
+            $remaining = $maxAttempts - $attempts;
+
+            if ($remaining > 0) {
+                error("Invalid credentials. {$remaining} attempt(s) remaining.");
+                $this->newLine();
+            } else {
+                error('Maximum login attempts exceeded.');
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Display login banner
+     *
+     * @return void
+     */
+    protected function displayLoginBanner(): void
+    {
+        $this->newLine(2);
+        $this->line('╔═══════════════════════════════════════════════════════════════════════╗');
+        $this->line('║                                                                       ║');
+        $this->line('║   ███████╗██████╗ ██╗    ██╗ █████╗ ██████╗ ██████╗                 ║');
+        $this->line('║   ██╔════╝██╔══██╗██║    ██║██╔══██╗██╔══██╗██╔══██╗                ║');
+        $this->line('║   █████╗  ██║  ██║██║ █╗ ██║███████║██████╔╝██║  ██║                ║');
+        $this->line('║   ██╔══╝  ██║  ██║██║███╗██║██╔══██║██╔══██╗██║  ██║                ║');
+        $this->line('║   ███████╗██████╔╝╚███╔███╔╝██║  ██║██║  ██║██████╔╝                ║');
+        $this->line('║   ╚══════╝╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝                 ║');
+        $this->line('║                                                                       ║');
+        $this->line('║                    NEXUS ERP - EDWARD CLI                            ║');
+        $this->line('║              Terminal-based Enterprise Management                    ║');
+        $this->line('║                                                                       ║');
+        $this->line('║                         LOGIN REQUIRED                                ║');
+        $this->line('║                                                                       ║');
+        $this->line('╚═══════════════════════════════════════════════════════════════════════╝');
+        $this->newLine();
     }
     
     /**
