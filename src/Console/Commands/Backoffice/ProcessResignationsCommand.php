@@ -4,113 +4,121 @@ declare(strict_types=1);
 
 namespace Nexus\Erp\Console\Commands\Backoffice;
 
-use Nexus\Backoffice\Models\Staff;
 use Illuminate\Console\Command;
+use Nexus\Erp\Actions\Backoffice\ProcessResignationsAction;
+use Nexus\Backoffice\Models\Company;
+use Carbon\Carbon;
 
 /**
  * Process Scheduled Resignations Command
  * 
- * Orchestrates the processing of staff resignations that are scheduled for today or earlier.
- * This command should be run daily via cron to automatically update staff status.
- * 
- * This orchestration command coordinates with the Nexus Backoffice package to handle
- * the business logic of staff resignation processing while providing command line interface.
+ * Uses ProcessResignationsAction to handle business logic.
  */
 class ProcessResignationsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     */
     protected $signature = 'nexus:backoffice:process-resignations
                            {--dry-run : Run without making changes}
+                           {--date= : Process resignations for specific date (YYYY-MM-DD)}
+                           {--company= : Process resignations for specific company ID only}
                            {--force : Process without confirmation}';
 
-    /**
-     * The console command description.
-     */
     protected $description = 'Process scheduled staff resignations that are due';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         $this->info('Processing scheduled resignations...');
 
-        // Get staff with pending resignations that are due
-        $dueResignations = Staff::pendingResignation()
-            ->whereDate('resignation_date', '<=', now()->toDateString())
-            ->get();
-
-        if ($dueResignations->isEmpty()) {
-            $this->info('No resignations to process.');
-            return self::SUCCESS;
+        $dryRun = $this->option('dry-run');
+        $date = $this->option('date');
+        $companyId = $this->option('company');
+        $force = $this->option('force');
+        
+        if ($date && !$this->isValidDate($date)) {
+            $this->error('Invalid date format. Please use YYYY-MM-DD format.');
+            return self::FAILURE;
         }
-
-        $this->info("Found {$dueResignations->count()} resignation(s) to process:");
-
-        // Display resignations to be processed
-        $headers = ['Employee ID', 'Name', 'Department', 'Resignation Date', 'Reason'];
-        $rows = $dueResignations->map(function (Staff $staff) {
-            return [
-                $staff->employee_id,
-                $staff->full_name,
-                $staff->department?->name ?? 'N/A',
-                $staff->resignation_date?->format('Y-m-d') ?? 'N/A',
-                $staff->resignation_reason ? substr($staff->resignation_reason, 0, 50) . '...' : 'N/A'
-            ];
-        });
-
-        $this->table($headers, $rows);
-
-        // Check for dry run
-        if ($this->option('dry-run')) {
-            $this->warn('Dry run mode - no changes will be made.');
-            return self::SUCCESS;
-        }
-
-        // Confirm processing unless forced
-        if (!$this->option('force')) {
-            if (!$this->confirm('Do you want to process these resignations?')) {
-                $this->info('Processing cancelled.');
+        
+        try {
+            $asOfDate = $date ? Carbon::parse($date) : now();
+            $company = $companyId ? Company::find($companyId) : null;
+            
+            if ($companyId && !$company) {
+                $this->error("Company with ID {$companyId} not found.");
+                return self::FAILURE;
+            }
+            
+            if ($dryRun) {
+                $this->warn('DRY RUN MODE - No changes will be made');
+            }
+            
+            $this->info("Processing resignations as of: {$asOfDate->toDateString()}");
+            
+            if ($company) {
+                $this->info("Filtering by company: {$company->name}");
+            }
+            
+            $action = new ProcessResignationsAction();
+            $result = $action->execute($company, $asOfDate, $dryRun);
+            
+            if (empty($result['resignations']) && $result['processed'] === 0) {
+                $this->info('No resignations to process.');
                 return self::SUCCESS;
             }
-        }
-
-        $processed = 0;
-        $errors = 0;
-
-        // Process each resignation using the package's business logic
-        foreach ($dueResignations as $staff) {
-            try {
-                $this->processStaffResignation($staff);
-                $processed++;
-                $this->info("✓ Processed resignation for {$staff->full_name} ({$staff->employee_id})");
-            } catch (\Exception $e) {
-                $errors++;
-                $this->error("✗ Failed to process {$staff->full_name} ({$staff->employee_id}): {$e->getMessage()}");
+            
+            if (!$dryRun && !$force && !$this->confirmProcessing($result)) {
+                $this->info('Processing cancelled by user.');
+                return self::SUCCESS;
             }
+            
+            $this->displayResults($result);
+            
+            return self::SUCCESS;
+            
+        } catch (\Exception $e) {
+            $this->error('Failed to process resignations: ' . $e->getMessage());
+            return self::FAILURE;
         }
-
-        // Summary
-        $this->info("\nProcessing complete:");
-        $this->info("- Processed: {$processed}");
-        if ($errors > 0) {
-            $this->warn("- Errors: {$errors}");
-        }
-
-        return $errors > 0 ? self::FAILURE : self::SUCCESS;
     }
 
-    /**
-     * Process individual staff resignation using package business logic.
-     */
-    private function processStaffResignation(Staff $staff): void
+    protected function confirmProcessing(array $result): bool
     {
-        // Delegate to the package's business logic
-        $staff->processResignation();
+        $this->info("Found {$result['processed']} resignation(s) to process:");
+        
+        foreach ($result['resignations'] as $resignation) {
+            $this->line("- {$resignation['name']} (Resignation date: {$resignation['resignation_date']})");
+        }
+        
+        return $this->confirm('Do you want to proceed with processing these resignations?');
+    }
 
-        // Log the resignation processing
-        $this->info("Resignation processed for {$staff->full_name} on {$staff->resignation_date->format('Y-m-d')}");
+    protected function displayResults(array $result): void
+    {
+        if ($result['dry_run']) {
+            $this->info("DRY RUN: Would process {$result['processed']} resignations");
+        } else {
+            $this->info("Successfully processed {$result['processed']} resignations");
+        }
+        
+        if ($result['failed'] > 0) {
+            $this->warn("Failed to process {$result['failed']} resignations");
+            
+            if (!empty($result['errors'])) {
+                $this->newLine();
+                $this->error('Errors encountered:');
+                foreach ($result['errors'] as $error) {
+                    $this->error("- Staff ID {$error['staff_id']} ({$error['staff_name']}): {$error['error']}");
+                }
+            }
+        }
+    }
+
+    protected function isValidDate(string $date): bool
+    {
+        try {
+            Carbon::parse($date);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

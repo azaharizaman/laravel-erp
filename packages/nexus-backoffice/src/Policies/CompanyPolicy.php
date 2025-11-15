@@ -5,24 +5,32 @@ declare(strict_types=1);
 namespace Nexus\Backoffice\Policies;
 
 use Nexus\Backoffice\Models\Company;
+use Nexus\Backoffice\Contracts\UserProviderContract;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 /**
  * Company Policy
  * 
  * Authorization policy for Company model operations.
+ * Uses UserProviderContract to abstract user management dependencies.
  */
 class CompanyPolicy
 {
     use HandlesAuthorization;
 
     /**
+     * Create a new policy instance.
+     */
+    public function __construct(
+        protected UserProviderContract $userProvider
+    ) {}
+
+    /**
      * Determine whether the user can view any companies.
      */
     public function viewAny($user): bool
     {
-        // Implement your authorization logic
-        return true;
+        return $this->userProvider->userHasPermission($user->id, 'backoffice.company.viewAny');
     }
 
     /**
@@ -30,8 +38,13 @@ class CompanyPolicy
      */
     public function view($user, Company $company): bool
     {
-        // Implement your authorization logic
-        return true;
+        // Check if user has general view permission
+        if ($this->userProvider->userHasPermission($user->id, 'backoffice.company.view')) {
+            return true;
+        }
+        
+        // Check if user can access this specific company
+        return $this->userProvider->canUserAccessCompany($user->id, $company->id);
     }
 
     /**
@@ -39,8 +52,7 @@ class CompanyPolicy
      */
     public function create($user): bool
     {
-        // Implement your authorization logic
-        return true;
+        return $this->userProvider->userHasPermission($user->id, 'backoffice.company.create');
     }
 
     /**
@@ -48,8 +60,13 @@ class CompanyPolicy
      */
     public function update($user, Company $company): bool
     {
-        // Implement your authorization logic
-        return true;
+        // Check if user has general update permission
+        if ($this->userProvider->userHasPermission($user->id, 'backoffice.company.update')) {
+            return true;
+        }
+        
+        // Check if user can access this specific company
+        return $this->userProvider->canUserAccessCompany($user->id, $company->id);
     }
 
     /**
@@ -57,6 +74,11 @@ class CompanyPolicy
      */
     public function delete($user, Company $company): bool
     {
+        // Check if user has delete permission
+        if (!$this->userProvider->userHasPermission($user->id, 'backoffice.company.delete')) {
+            return false;
+        }
+
         // Prevent deletion if company has child companies
         if ($company->childCompanies()->exists()) {
             return false;
@@ -72,7 +94,7 @@ class CompanyPolicy
             return false;
         }
 
-        return true;
+        return $this->userProvider->canUserAccessCompany($user->id, $company->id);
     }
 
     /**
@@ -80,7 +102,15 @@ class CompanyPolicy
      */
     public function restore($user, Company $company): bool
     {
-        return true;
+        return $this->userProvider->userHasPermission($user->id, 'backoffice.company.restore');
+    }
+
+    /**
+     * Determine whether the user can manage hierarchy.
+     */
+    public function manageHierarchy($user, Company $company): bool
+    {
+        return $this->userProvider->userHasPermission($user->id, 'backoffice.company.manageHierarchy');
     }
 
     /**
