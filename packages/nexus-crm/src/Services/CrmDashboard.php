@@ -6,6 +6,7 @@ namespace Nexus\Crm\Services;
 
 use Nexus\Crm\Models\CrmEntity;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * CRM Dashboard Service
@@ -19,13 +20,15 @@ class CrmDashboard
      */
     public function forUser(string $userId): array
     {
-        return [
-            'pending_leads' => $this->getPendingLeads($userId),
-            'active_opportunities' => $this->getActiveOpportunities($userId),
-            'overdue_items' => $this->getOverdueItems($userId),
-            'recent_activity' => $this->getRecentActivity($userId),
-            'pipeline_metrics' => $this->getPipelineMetrics($userId),
-        ];
+        return Cache::remember("crm_dashboard_user_{$userId}", 300, function () use ($userId) {
+            return [
+                'pending_leads' => $this->getPendingLeads($userId),
+                'active_opportunities' => $this->getActiveOpportunities($userId),
+                'overdue_items' => $this->getOverdueItems($userId),
+                'recent_activity' => $this->getRecentActivity($userId),
+                'pipeline_metrics' => $this->getPipelineMetrics($userId),
+            ];
+        });
     }
 
     /**
@@ -113,19 +116,24 @@ class CrmDashboard
      */
     public function forTeam(array $userIds): array
     {
-        $allEntities = CrmEntity::whereHas('assignments', function ($query) use ($userIds) {
-            $query->whereIn('user_id', $userIds)->where('is_active', true);
-        })->get();
+        sort($userIds);
+        $cacheKey = 'crm_dashboard_team_' . md5(implode(',', $userIds));
 
-        return [
-            'team_entities' => $allEntities,
-            'team_metrics' => [
-                'total_entities' => $allEntities->count(),
-                'by_status' => $allEntities->groupBy('status')->map->count(),
-                'by_assignee' => $allEntities->groupBy(function ($entity) {
-                    return $entity->assignments->where('is_active', true)->pluck('user_id')->first();
-                })->map->count(),
-            ],
-        ];
+        return Cache::remember($cacheKey, 300, function () use ($userIds) {
+            $allEntities = CrmEntity::whereHas('assignments', function ($query) use ($userIds) {
+                $query->whereIn('user_id', $userIds)->where('is_active', true);
+            })->get();
+
+            return [
+                'team_entities' => $allEntities,
+                'team_metrics' => [
+                    'total_entities' => $allEntities->count(),
+                    'by_status' => $allEntities->groupBy('status')->map->count(),
+                    'by_assignee' => $allEntities->groupBy(function ($entity) {
+                        return $entity->assignments->where('is_active', true)->pluck('user_id')->first();
+                    })->map->count(),
+                ],
+            ];
+        });
     }
 }

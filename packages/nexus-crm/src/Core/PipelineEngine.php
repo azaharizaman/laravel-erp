@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
 class PipelineEngine
 {
     public function __construct(
-        private ConditionEvaluator $conditionEvaluator,
+        private ConditionEvaluatorManager $conditionEvaluator,
         private AssignmentStrategyResolver $assignmentResolver,
         private IntegrationManager $integrationManager
     ) {}

@@ -56,13 +56,18 @@ class CrmServiceProvider extends ServiceProvider
         // Register pipeline engine and related services
         $this->app->singleton(\Nexus\Crm\Core\PipelineEngine::class, function ($app) {
             return new \Nexus\Crm\Core\PipelineEngine(
-                $app->make(\Nexus\Crm\Core\ConditionEvaluator::class),
+                $app->make(\Nexus\Crm\Core\ConditionEvaluatorManager::class),
                 $app->make(\Nexus\Crm\Core\AssignmentStrategyResolver::class),
                 $app->make(\Nexus\Crm\Core\IntegrationManager::class)
             );
         });
 
-        $this->app->singleton(\Nexus\Crm\Core\ConditionEvaluator::class);
+        $this->app->singleton(\Nexus\Crm\Core\ConditionEvaluatorManager::class, function ($app) {
+            $manager = new \Nexus\Crm\Core\ConditionEvaluatorManager();
+            // Register default evaluator
+            // For now, it's built-in, but can be extended
+            return $manager;
+        });
         $this->app->singleton(\Nexus\Crm\Core\AssignmentStrategyResolver::class);
         $this->app->singleton(\Nexus\Crm\Core\IntegrationManager::class);
 
