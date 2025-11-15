@@ -566,9 +566,6 @@ packages/nexus-analytics/
 │   │       ├── Services/
 │   │       │   ├── AnalyticsDashboard.php
 │   │       │   └── LaravelAnalyticsEngine.php
-│   │       ├── Commands/
-│   │       │   ├── ProcessTimersCommand.php
-│   │       │   └── GenerateReportCommand.php
 │   │       └── AnalyticsServiceProvider.php
 │   │
 │   ├── Events/                         # Domain events
@@ -625,9 +622,11 @@ src/Actions/Analytics/                  # In Nexus\Erp namespace
 ├── Dashboards/
 │   ├── GetDashboardAction.php
 │   └── UpdateDashboardAction.php
-└── Predictions/
-    ├── RunPredictionAction.php
-    └── TrainModelAction.php
+├── Predictions/
+│   ├── RunPredictionAction.php
+│   └── TrainModelAction.php
+└── Timers/
+    └── ProcessTimersAction.php
 
 routes/analytics.php                    # In Nexus\Erp namespace
 console/analytics.php                   # Console commands via Actions
@@ -761,12 +760,13 @@ composer test-coverage                  # Target: >85%
 ```json
 {
     "require": {
-        "php": "^8.3"
+        "php": "^8.3",
+        "laravel/framework": "^12.0"
     }
 }
 ```
 
-**Note:** Core analytics engine (`src/Core/`) has ZERO framework dependencies.
+**Note:** Core analytics engine (`src/Core/`) has ZERO framework dependencies. Laravel is required for the adapter layer (`src/Adapters/Laravel/`) which includes Models, Events, and Service Providers.
 
 ### Optional Dependencies (Laravel Adapter)
 
@@ -821,7 +821,7 @@ To verify Maximum Atomicity compliance:
 cd packages/nexus-analytics && composer test
 
 # 2. Check for architectural violations
-find src -name "*Controller*" -o -name "*Command*" | wc -l  # Should be 0 in src/Core
+find src -name "*Controller*" -o -name "*Command*" | wc -l  # Should be 0 in entire src/
 grep -r "Nexus\\\\" src/Core/ | grep -v "Nexus\\Analytics"  # Should be empty
 
 # 3. Verify no cross-package dependencies
