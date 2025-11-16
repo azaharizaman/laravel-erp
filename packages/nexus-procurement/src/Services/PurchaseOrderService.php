@@ -82,6 +82,15 @@ class PurchaseOrderService implements PurchaseOrderServiceContract
      */
     public function create(array $data): PurchaseOrder
     {
+        // Validate required fields
+        if (!isset($data['expected_delivery_date'])) {
+            throw new \InvalidArgumentException('Expected delivery date is required.');
+        }
+
+        if (!isset($data['items']) || !is_array($data['items']) || empty($data['items'])) {
+            throw new \InvalidArgumentException('At least one item is required.');
+        }
+
         $vendor = Vendor::findOrFail($data['vendor_id']);
 
         return DB::transaction(function () use ($data, $vendor) {
@@ -102,18 +111,26 @@ class PurchaseOrderService implements PurchaseOrderServiceContract
                 'created_by' => Auth::id(),
             ]);
 
-            // Create PO items
-            if (isset($data['items']) && is_array($data['items'])) {
-                foreach ($data['items'] as $itemData) {
-                    $purchaseOrder->items()->create([
-                        'item_description' => $itemData['item_description'],
-                        'quantity' => $itemData['quantity'],
-                        'unit_price' => $itemData['unit_price'],
-                        'total_price' => $itemData['quantity'] * $itemData['unit_price'],
-                        'uom' => $itemData['uom'] ?? null,
-                        'specifications' => $itemData['specifications'] ?? null,
-                    ]);
+            // Create PO items with validation
+            foreach ($data['items'] as $itemData) {
+                if (!isset($itemData['item_description']) || empty($itemData['item_description'])) {
+                    throw new \InvalidArgumentException('Item description is required for all items.');
                 }
+                if (!isset($itemData['quantity']) || $itemData['quantity'] <= 0) {
+                    throw new \InvalidArgumentException('Item quantity must be greater than zero.');
+                }
+                if (!isset($itemData['unit_price']) || $itemData['unit_price'] < 0) {
+                    throw new \InvalidArgumentException('Item unit price must be non-negative.');
+                }
+                
+                $purchaseOrder->items()->create([
+                    'item_description' => $itemData['item_description'],
+                    'quantity' => $itemData['quantity'],
+                    'unit_price' => $itemData['unit_price'],
+                    'total_price' => $itemData['quantity'] * $itemData['unit_price'],
+                    'uom' => $itemData['uom'] ?? null,
+                    'specifications' => $itemData['specifications'] ?? null,
+                ]);
             }
 
             // Calculate totals

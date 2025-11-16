@@ -129,42 +129,41 @@ class ApprovalMatrixRules
             // Replace variable names with their values
             $expression = $condition;
             
-            // Handle string comparisons (quoted values)
-            foreach ($variables as $key => $value) {
+            // Sort keys by length (longest first) to avoid partial replacements
+            $sortedKeys = array_keys($variables);
+            usort($sortedKeys, fn($a, $b) => strlen($b) - strlen($a));
+            
+            foreach ($sortedKeys as $key) {
+                $value = $variables[$key];
+                // Use word boundary to avoid partial replacements
                 if (is_string($value)) {
-                    $expression = str_replace($key, "'{$value}'", $expression);
+                    // Escape single quotes to prevent injection
+                    $escapedValue = str_replace("'", "\\'", $value);
+                    $expression = preg_replace('/\b' . preg_quote($key, '/') . '\b/', "'{$escapedValue}'", $expression);
                 } else {
-                    $expression = str_replace($key, (string)$value, $expression);
+                    $expression = preg_replace('/\b' . preg_quote($key, '/') . '\b/', (string)$value, $expression);
                 }
             }
             
-            // Split by AND/OR operators
+            // Respect operator precedence: AND before OR
             $expression = trim($expression);
             
-            // Handle OR logic
-            if (stripos($expression, ' OR ') !== false) {
-                $parts = preg_split('/\s+OR\s+/i', $expression);
-                foreach ($parts as $part) {
-                    if (self::evaluateSingleCondition(trim($part))) {
-                        return true;
+            // Split by OR first, then evaluate each part as a group of ANDs
+            $orParts = preg_split('/\s+OR\s+/i', $expression);
+            foreach ($orParts as $orPart) {
+                $andParts = preg_split('/\s+AND\s+/i', $orPart);
+                $allAndTrue = true;
+                foreach ($andParts as $andPart) {
+                    if (!self::evaluateSingleCondition(trim($andPart))) {
+                        $allAndTrue = false;
+                        break;
                     }
                 }
-                return false;
-            }
-            
-            // Handle AND logic
-            if (stripos($expression, ' AND ') !== false) {
-                $parts = preg_split('/\s+AND\s+/i', $expression);
-                foreach ($parts as $part) {
-                    if (!self::evaluateSingleCondition(trim($part))) {
-                        return false;
-                    }
+                if ($allAndTrue) {
+                    return true;
                 }
-                return true;
             }
-            
-            // Single condition
-            return self::evaluateSingleCondition($expression);
+            return false;
             
         } catch (\Throwable $e) {
             return false;
@@ -182,32 +181,32 @@ class ApprovalMatrixRules
         // Parse comparison operators: <=, >=, ==, !=, <, >
         
         // Try <= operator
-        if (preg_match('/^(.+?)\s*<=\s*(.+)$/', $condition, $matches)) {
+        if (preg_match('/^(.+)\s*<=\s*(.+)$/', $condition, $matches)) {
             return self::compareValues(trim($matches[1]), trim($matches[2]), '<=');
         }
         
         // Try >= operator
-        if (preg_match('/^(.+?)\s*>=\s*(.+)$/', $condition, $matches)) {
+        if (preg_match('/^(.+)\s*>=\s*(.+)$/', $condition, $matches)) {
             return self::compareValues(trim($matches[1]), trim($matches[2]), '>=');
         }
         
         // Try == operator
-        if (preg_match('/^(.+?)\s*==\s*(.+)$/', $condition, $matches)) {
+        if (preg_match('/^(.+)\s*==\s*(.+)$/', $condition, $matches)) {
             return self::compareValues(trim($matches[1]), trim($matches[2]), '==');
         }
         
         // Try != operator
-        if (preg_match('/^(.+?)\s*!=\s*(.+)$/', $condition, $matches)) {
+        if (preg_match('/^(.+)\s*!=\s*(.+)$/', $condition, $matches)) {
             return self::compareValues(trim($matches[1]), trim($matches[2]), '!=');
         }
         
-        // Try < operator
-        if (preg_match('/^(.+?)\s*<\s*(.+)$/', $condition, $matches)) {
+        // Try < operator (must come after <= to avoid matching < first)
+        if (preg_match('/^(.+)\s*<\s*(.+)$/', $condition, $matches)) {
             return self::compareValues(trim($matches[1]), trim($matches[2]), '<');
         }
         
-        // Try > operator
-        if (preg_match('/^(.+?)\s*>\s*(.+)$/', $condition, $matches)) {
+        // Try > operator (must come after >= to avoid matching > first)
+        if (preg_match('/^(.+)\s*>\s*(.+)$/', $condition, $matches)) {
             return self::compareValues(trim($matches[1]), trim($matches[2]), '>');
         }
         
