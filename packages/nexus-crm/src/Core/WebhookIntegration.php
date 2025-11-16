@@ -69,7 +69,13 @@ class WebhookIntegration implements IntegrationContract
         }
 
         $parsedUrl = parse_url($url);
+        if ($parsedUrl === false) {
+            throw new \RuntimeException("Invalid webhook URL: {$url}");
+        }
         $host = $parsedUrl['host'] ?? '';
+        if ($host === '') {
+            throw new \RuntimeException("Webhook URL '{$url}' does not contain a valid host");
+        }
 
         foreach ($whitelist as $allowedPattern) {
             if (fnmatch($allowedPattern, $host)) {
