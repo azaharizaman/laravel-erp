@@ -44,6 +44,10 @@ class ProcurementServiceProvider extends ServiceProvider
 
         // Load routes
         $this->loadRoutesFrom(__DIR__.'/../../routes/procurement-api.php');
+        $this->loadRoutesFrom(__DIR__.'/../../routes/vendor-portal-api.php');
+
+        // Register middleware
+        $this->registerMiddleware();
 
         // Register commands if any
         if ($this->app->runningInConsole()) {
@@ -67,5 +71,20 @@ class ProcurementServiceProvider extends ServiceProvider
         $this->app->singleton(\Nexus\Procurement\Services\PurchaseOrderService::class);
         $this->app->singleton(\Nexus\Procurement\Services\ThreeWayMatchService::class);
         $this->app->singleton(\Nexus\Procurement\Services\GoodsReceiptService::class);
+        $this->app->singleton(\Nexus\Procurement\Services\RFQManagementService::class);
+        $this->app->singleton(\Nexus\Procurement\Services\BlanketPurchaseOrderService::class);
+        $this->app->singleton(\Nexus\Procurement\Services\ContractManagementService::class);
+        $this->app->singleton(\Nexus\Procurement\Services\VendorPerformanceService::class);
+        $this->app->singleton(\Nexus\Procurement\Services\ProcurementAnalyticsService::class);
+        $this->app->singleton(\Nexus\Procurement\Services\VendorPortalService::class);
+    }
+
+    /**
+     * Register middleware.
+     */
+    private function registerMiddleware(): void
+    {
+        $router = $this->app['router'];
+        $router->aliasMiddleware('vendor-portal', \Nexus\Procurement\Http\Middleware\VendorPortalAuth::class);
     }
 }
