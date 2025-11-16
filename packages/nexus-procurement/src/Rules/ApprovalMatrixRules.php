@@ -122,24 +122,138 @@ class ApprovalMatrixRules
      */
     protected static function evaluateCondition(string $condition, array $variables): bool
     {
-        // Simple condition evaluation - in production, consider using a proper expression evaluator
-        $condition = str_replace(
-            ['total_amount', 'department', 'gl_account', 'category'],
-            [
-                $variables['total_amount'] ?? 0,
-                "'" . ($variables['department'] ?? '') . "'",
-                "'" . ($variables['gl_account'] ?? '') . "'",
-                "'" . ($variables['category'] ?? '') . "'",
-            ],
-            $condition
-        );
-
-        // Use eval with caution - in production, implement a safer expression evaluator
+        // Safe expression evaluation without eval()
+        // Supports: <=, >=, <, >, ==, !=, AND, OR
+        
         try {
-            return eval("return {$condition};");
+            // Replace variable names with their values
+            $expression = $condition;
+            
+            // Handle string comparisons (quoted values)
+            foreach ($variables as $key => $value) {
+                if (is_string($value)) {
+                    $expression = str_replace($key, "'{$value}'", $expression);
+                } else {
+                    $expression = str_replace($key, (string)$value, $expression);
+                }
+            }
+            
+            // Split by AND/OR operators
+            $expression = trim($expression);
+            
+            // Handle OR logic
+            if (stripos($expression, ' OR ') !== false) {
+                $parts = preg_split('/\s+OR\s+/i', $expression);
+                foreach ($parts as $part) {
+                    if (self::evaluateSingleCondition(trim($part))) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // Handle AND logic
+            if (stripos($expression, ' AND ') !== false) {
+                $parts = preg_split('/\s+AND\s+/i', $expression);
+                foreach ($parts as $part) {
+                    if (!self::evaluateSingleCondition(trim($part))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            
+            // Single condition
+            return self::evaluateSingleCondition($expression);
+            
         } catch (\Throwable $e) {
             return false;
         }
+    }
+    
+    /**
+     * Evaluate a single comparison condition
+     *
+     * @param string $condition
+     * @return bool
+     */
+    protected static function evaluateSingleCondition(string $condition): bool
+    {
+        // Parse comparison operators: <=, >=, ==, !=, <, >
+        
+        // Try <= operator
+        if (preg_match('/^(.+?)\s*<=\s*(.+)$/', $condition, $matches)) {
+            return self::compareValues(trim($matches[1]), trim($matches[2]), '<=');
+        }
+        
+        // Try >= operator
+        if (preg_match('/^(.+?)\s*>=\s*(.+)$/', $condition, $matches)) {
+            return self::compareValues(trim($matches[1]), trim($matches[2]), '>=');
+        }
+        
+        // Try == operator
+        if (preg_match('/^(.+?)\s*==\s*(.+)$/', $condition, $matches)) {
+            return self::compareValues(trim($matches[1]), trim($matches[2]), '==');
+        }
+        
+        // Try != operator
+        if (preg_match('/^(.+?)\s*!=\s*(.+)$/', $condition, $matches)) {
+            return self::compareValues(trim($matches[1]), trim($matches[2]), '!=');
+        }
+        
+        // Try < operator
+        if (preg_match('/^(.+?)\s*<\s*(.+)$/', $condition, $matches)) {
+            return self::compareValues(trim($matches[1]), trim($matches[2]), '<');
+        }
+        
+        // Try > operator
+        if (preg_match('/^(.+?)\s*>\s*(.+)$/', $condition, $matches)) {
+            return self::compareValues(trim($matches[1]), trim($matches[2]), '>');
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Compare two values using the specified operator
+     *
+     * @param string $left
+     * @param string $right
+     * @param string $operator
+     * @return bool
+     */
+    protected static function compareValues(string $left, string $right, string $operator): bool
+    {
+        // Remove quotes from string values
+        $left = trim($left, "'\"");
+        $right = trim($right, "'\"");
+        
+        // Try numeric comparison first
+        if (is_numeric($left) && is_numeric($right)) {
+            $left = (float)$left;
+            $right = (float)$right;
+            
+            return match($operator) {
+                '<=' => $left <= $right,
+                '>=' => $left >= $right,
+                '<' => $left < $right,
+                '>' => $left > $right,
+                '==' => $left == $right,
+                '!=' => $left != $right,
+                default => false,
+            };
+        }
+        
+        // String comparison
+        return match($operator) {
+            '<=' => $left <= $right,
+            '>=' => $left >= $right,
+            '<' => $left < $right,
+            '>' => $left > $right,
+            '==' => $left == $right,
+            '!=' => $left != $right,
+            default => false,
+        };
     }
 
     /**
